@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Xác nhận đơn hàng</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+        body { margin: 0; padding: 0; min-width: 100%; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; background-color: #FAFAFA; color: #222222; }
+        a { color: #000; text-decoration: none; }
+        h1 { font-size: 24px; font-weight: 700; line-height: 1.25; margin-top: 0; margin-bottom: 15px; text-align: center; }
+        p { margin-top: 0; margin-bottom: 24px; }
+        .email-wrapper { max-width: 600px; margin: 0 auto; }
+        .email-header { background-color: #0070f3; padding: 24px; color: #ffffff; }
+        .email-body { padding: 24px; background-color: #ffffff; }
+        .email-footer { background-color: #f6f6f6; padding: 24px; }
+        .order-details { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .order-details th, .order-details td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+        .order-details th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-header">
+            <h1>Cảm ơn bạn đã đặt hàng</h1>
+        </div>
+        <div class="email-body">
+            <p>Đơn hàng của bạn đã được xác nhận. Chúc mừng bạn đã đăng ký thành công khóa học!</p>
+            <p>Dưới đây là thông tin chi tiết đơn hàng của bạn:</p>
+            <table class="order-details">
+                <tr>
+                    <th>Mã đơn hàng</th>
+                    <td><%= order._id %></td>
+                </tr>
+                <tr>
+                    <th>Ngày đặt</th>
+                    <td><%= order.date %></td>
+                </tr>
+                <tr>
+                    <th>Khóa học</th>
+                    <td><%= order.name %></td>
+                </tr>
+                <tr>
+                    <th>Tổng tiền</th>
+                    <td><%= order.price %> VNĐ</td>
+                </tr>
+            </table>
+            <p>Vui lòng đăng nhập vào tài khoản để truy cập nội dung khóa học.</p>
+        </div>
+        <div class="email-footer">
+            <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi tại <a href="mailto:support@englishlms.com">support@englishlms.com</a></p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+# Bỏ qua node_modules của server và client
+server/node_modules
+client/node_modules
+
+# Bỏ qua các file môi trường .env
+server/.env
+client/.env
+.env
+
+# Next.js build folder
+.next
+
+# Các file rác chung
+.DS_Store
+*.log
+dist
+
+# --- AI Automation Files ---
+tat_ca_code_cu.txt
+code_moi.md
+code-moi.md
+gop_code.py
+tach_code.py
+cap_nhat_code.py
