@@ -42,14 +42,11 @@ export const editCourse = CatchAsyncErrors(async (req: Request, res: Response, n
         const thumbnail = data.thumbnail;
         const courseId = req.params.id;
 
-        // Nếu có cập nhật thumbnail mới
         if (thumbnail && !thumbnail.startsWith("https")) {
-            // Xóa thumbnail cũ trên Cloudinary
             const courseData = await CourseModel.findById(courseId) as any;
             if(courseData?.thumbnail?.public_id) {
                 await cloudinary.v2.uploader.destroy(courseData.thumbnail.public_id);
             }
-            // Upload thumbnail mới
             const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
                 folder: "courses",
             });
@@ -59,7 +56,6 @@ export const editCourse = CatchAsyncErrors(async (req: Request, res: Response, n
                 url: myCloud.secure_url,
             };
         } else if (thumbnail && thumbnail.startsWith("https")) {
-             // Giữ nguyên ảnh cũ nếu user không thay đổi
             const courseData = await CourseModel.findById(courseId) as any;
             data.thumbnail = {
                 public_id: courseData?.thumbnail.public_id,
@@ -101,7 +97,6 @@ export const getSingleCourse = CatchAsyncErrors(async (req: Request, res: Respon
                 return next(new ErrorHandler("Không tìm thấy khóa học", 404));
             }
 
-            // Set cache 7 ngày
             await redis.set(courseId.toString(), JSON.stringify(course), "EX", 604800);
 
             res.status(200).json({
@@ -185,7 +180,6 @@ export const addQuestion = CatchAsyncErrors(async (req: Request, res: Response, 
             return next(new ErrorHandler("Không tìm thấy nội dung khóa học", 400));
         }
 
-        // Tạo object câu hỏi mới (Tuân thủ theo Schema hiện tại của project)
         const newQuestion: any = {
             user: req.user,
             comment: question, 
@@ -241,17 +235,18 @@ export const addAnswer = CatchAsyncErrors(async (req: Request, res: Response, ne
             return next(new ErrorHandler("Không tìm thấy câu hỏi", 400));
         }
 
-        // Tạo object câu trả lời
+        // BỔ SUNG FIX TỪ VIDEO: Ép cứng createdAt/updatedAt cho sub-doc của commentReplies
         const newAnswer: any = {
             user: req.user,
             comment: answer,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
 
         question.commentReplies.push(newAnswer);
 
         await course?.save();
 
-        // Gửi mail thông báo cho user nếu người trả lời không phải là người đặt câu hỏi
         if (req.user?._id?.toString() !== (question.user as any)?._id?.toString()) {
             const data = {
                 name: (question.user as any)?.name,
@@ -271,7 +266,6 @@ export const addAnswer = CatchAsyncErrors(async (req: Request, res: Response, ne
                 return next(new ErrorHandler(error.message, 500));
             }
         } else {
-            // Nếu người đặt câu hỏi tự trả lời thì gửi thông báo cho admin
             await NotificationModel.create({
                 userId: req.user?._id?.toString(),
                 title: "Phản hồi câu hỏi mới",
@@ -318,7 +312,6 @@ export const addReview = CatchAsyncErrors(async (req: Request, res: Response, ne
 
         course?.reviews.push(reviewData);
 
-        // Tính trung bình rating
         let avg = 0;
         course?.reviews.forEach((rev: any) => {
             avg += rev.rating;
@@ -329,6 +322,9 @@ export const addReview = CatchAsyncErrors(async (req: Request, res: Response, ne
         }
 
         await course?.save();
+
+        // FIX TỪ VIDEO: Cập nhật lại Redis khi khóa học có sự thay đổi
+        await redis.set(courseId.toString(), JSON.stringify(course), "EX", 604800);
 
         await NotificationModel.create({
             userId: req.user?._id?.toString(),
@@ -368,9 +364,12 @@ export const addReplyToReview = CatchAsyncErrors(async (req: Request, res: Respo
             return next(new ErrorHandler("Không tìm thấy đánh giá", 404));
         }
 
+        // BỔ SUNG FIX TỪ VIDEO: Ép cứng createdAt/updatedAt cho sub-doc
         const replyData: any = {
             user: req.user,
             comment,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
 
         if(!review.commentReplies){
@@ -380,6 +379,9 @@ export const addReplyToReview = CatchAsyncErrors(async (req: Request, res: Respo
         review.commentReplies.push(replyData);
 
         await course?.save();
+
+        // FIX TỪ VIDEO: Cập nhật lại Redis khi khóa học có sự thay đổi
+        await redis.set(courseId.toString(), JSON.stringify(course), "EX", 604800);
 
         res.status(200).json({
             success: true,

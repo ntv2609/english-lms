@@ -2,7 +2,7 @@ import { styles } from "@/app/styles/style";
 import CoursePlayer from "@/app/utils/CoursePlayer";
 import Ratings from "@/app/components/utils/Ratings";
 import Link from "next/link";
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useEffect } from "react";
 import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import { format } from "timeago.js";
 import CourseContentList from "./CourseContentList";
@@ -18,12 +18,10 @@ interface Props {
 
 const CourseDetails: FC<Props> = ({ data, setRoute, setOpen: openAuthModal }) => {
   const { data: userData } = useLoadUserQuery(undefined, {});
-  const [user, setUser] = useState<any>();
-  const [createMoMoPayment, { data: paymentData, isSuccess, error, isLoading }] = useCreateMoMoPaymentMutation();
+  // TÁC GIẢ BỎ USESTATE Ở ĐÂY VÌ CẦN UPDATE USER CHUẨN XÁC SAU KHI MUA THÀNH CÔNG
+  const user = userData?.user; 
 
-  useEffect(() => {
-    setUser(userData?.user);
-  }, [userData]);
+  const [createMoMoPayment, { data: paymentData, isSuccess, error, isLoading }] = useCreateMoMoPaymentMutation();
 
   useEffect(() => {
     if (isSuccess && paymentData?.payUrl) {

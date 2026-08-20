@@ -13,6 +13,7 @@ export const layoutApi = apiSlice.injectEndpoints({
         url: "edit-layout",
         method: "PUT",
         body: data,
+        credentials: "include",
       }),
     }),
   }),

@@ -75,31 +75,37 @@ export const editLayout = CatchAsyncErrors(async (req: Request, res: Response, n
             const bannerData: any = await LayoutModel.findOne({ type: "Banner" });
             const { image, title, subTitle } = req.body;
 
-            // Xóa ảnh cũ trên cloudinary trước khi lưu ảnh mới
-            if(bannerData?.banner?.image?.public_id){
-                await cloudinary.v2.uploader.destroy(bannerData.banner.image.public_id);
+            const bannerObj: any = {
+                type: "Banner",
+                banner: { title, subTitle }
+            };
+
+            // FIX BUG: Xử lý upload ảnh an toàn kể cả khi tạo mới
+            if (image && !image.startsWith("https")) {
+                if(bannerData?.banner?.image?.public_id){
+                    await cloudinary.v2.uploader.destroy(bannerData.banner.image.public_id);
+                }
+                const myCloud = await cloudinary.v2.uploader.upload(image, {
+                    folder: "layout",
+                });
+                bannerObj.banner.image = {
+                    public_id: myCloud.public_id,
+                    url: myCloud.secure_url,
+                };
+            } else if (image && image.startsWith("https")) {
+                bannerObj.banner.image = bannerData?.banner?.image;
             }
 
-            const myCloud = await cloudinary.v2.uploader.upload(image, {
-                folder: "layout",
-            });
-            const banner = {
-                type: "Banner",
-                banner: {
-                    image: {
-                        public_id: myCloud.public_id,
-                        url: myCloud.secure_url,
-                    },
-                    title,
-                    subTitle,
-                },
-            };
-            await LayoutModel.findByIdAndUpdate(bannerData?._id, banner);
+            // Nếu DB rỗng thì Create, nếu có thì Update
+            if (!bannerData) {
+                await LayoutModel.create(bannerObj);
+            } else {
+                await LayoutModel.findByIdAndUpdate(bannerData._id, bannerObj);
+            }
         }
 
         if (type === "FAQ") {
             const { faq } = req.body;
-            const faqItem = await LayoutModel.findOne({ type: "FAQ" });
             const faqItems = await Promise.all(
                 faq.map(async (item: any) => {
                     return {
@@ -108,12 +114,16 @@ export const editLayout = CatchAsyncErrors(async (req: Request, res: Response, n
                     };
                 })
             );
-            await LayoutModel.findByIdAndUpdate(faqItem?._id, { type: "FAQ", faq: faqItems });
+            // FIX BUG BẰNG UPSERT: Đéo cần biết có hay chưa, cứ phang vào DB!
+            await LayoutModel.findOneAndUpdate(
+                { type: "FAQ" },
+                { type: "FAQ", faq: faqItems },
+                { upsert: true, new: true }
+            );
         }
 
         if (type === "Categories") {
             const { categories } = req.body;
-            const categoriesData = await LayoutModel.findOne({ type: "Categories" });
             const categoriesItems = await Promise.all(
                 categories.map(async (item: any) => {
                     return {
@@ -121,7 +131,12 @@ export const editLayout = CatchAsyncErrors(async (req: Request, res: Response, n
                     };
                 })
             );
-            await LayoutModel.findByIdAndUpdate(categoriesData?._id, { type: "Categories", categories: categoriesItems });
+            // FIX BUG BẰNG UPSERT: Cứu tinh chống báo "Thành công ảo"
+            await LayoutModel.findOneAndUpdate(
+                { type: "Categories" },
+                { type: "Categories", categories: categoriesItems },
+                { upsert: true, new: true }
+            );
         }
 
         res.status(200).json({

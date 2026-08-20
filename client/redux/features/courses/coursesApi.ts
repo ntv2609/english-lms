@@ -29,6 +29,50 @@ export const coursesApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    // Endpoint mới để fetch content bài giảng
+    getCourseContent: builder.query({
+      query: (id: string) => ({
+        url: `get-course-content/${id}`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    // Mutation thêm câu hỏi
+    addQuestion: builder.mutation({
+      query: (data) => ({
+        url: "add-question",
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      }),
+    }),
+    // Mutation trả lời câu hỏi
+    addAnswerInQuestion: builder.mutation({
+      query: (data) => ({
+        url: "add-answer",
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      }),
+    }),
+    // Mutation đánh giá khoá học
+    addReviewInCourse: builder.mutation({
+      query: ({ review, rating, courseId }) => ({
+        url: `add-review/${courseId}`,
+        method: "PUT",
+        body: { review, rating },
+        credentials: "include",
+      }),
+    }),
+    // Mutation phản hồi đánh giá
+    addReplyInReview: builder.mutation({
+      query: (data) => ({
+        url: "add-reply",
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      }),
+    }),
     deleteCourse: builder.mutation({
       query: (id) => ({
         url: `delete-course/${id}`,
@@ -52,6 +96,11 @@ export const {
   useGetAllCoursesQuery, 
   useGetUsersAllCoursesQuery,
   useGetCourseDetailsQuery,
+  useGetCourseContentQuery,
+  useAddQuestionMutation,
+  useAddAnswerInQuestionMutation,
+  useAddReviewInCourseMutation,
+  useAddReplyInReviewMutation,
   useDeleteCourseMutation, 
   useEditCourseMutation 
 } = coursesApi;

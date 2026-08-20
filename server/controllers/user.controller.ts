@@ -219,7 +219,7 @@ export const updateAccessToken = CatchAsyncErrors(
         { id: user._id },
         process.env.ACCESS_TOKEN as string,
         {
-          expiresIn: "5m",
+          expiresIn: "5m", 
         },
       );
 
@@ -236,13 +236,19 @@ export const updateAccessToken = CatchAsyncErrors(
       res.cookie("access_token", accessToken, accessTokenOptions);
       res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 
-      // Cập nhật lại thời gian hết hạn của Redis Session thành 7 ngày mỗi lần người dùng refresh token
       await redis.set(user._id.toString(), JSON.stringify(user), "EX", 604800); 
 
-      res.status(200).json({
-        success: true,
-        accessToken,
-      });
+      if (req.originalUrl.includes("/refresh")) {
+        res.status(200).json({
+          success: true,
+          accessToken,
+        });
+      } else {
+        // FIX BUG EXPIRED Ở ĐÂY LÀ HẾT NHỨC ĐẦU:
+        // Ép cập nhật lại req.cookies để thằng middleware isAuthenticated chạy ngay phía sau có token mới để kiểm tra
+        req.cookies.access_token = accessToken;
+        next();
+      }
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
