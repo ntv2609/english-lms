@@ -20,6 +20,10 @@ import { BiMessage } from "react-icons/bi";
 import { VscVerifiedFilled } from "react-icons/vsc";
 import { format } from "timeago.js";
 import Ratings from "../utils/Ratings";
+import socketIO from "socket.io-client";
+
+const ENDPOINT = process.env.NEXT_PUBLIC_SERVER_URI || "";
+const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 type Props = {
   data: any;
@@ -75,6 +79,11 @@ const CourseContentMedia = ({
       setQuestion("");
       refetch();
       toast.success("Đã thêm câu hỏi thành công");
+      socketId.emit("notification", {
+        title: "Câu hỏi mới",
+        message: `Bạn có một câu hỏi mới trong bài giảng ${data[activeVideo].title}`,
+        userId: user._id.toString(),
+      });
     }
     if (qError) {
       if ("data" in qError) {
@@ -86,6 +95,13 @@ const CourseContentMedia = ({
       setAnswer("");
       refetch();
       toast.success("Đã trả lời câu hỏi thành công");
+      if (user.role !== "admin") {
+         socketId.emit("notification", {
+             title: "Phản hồi câu hỏi mới",
+             message: `Người dùng ${user.name} đã phản hồi câu hỏi trong bài giảng ${data[activeVideo].title}`,
+             userId: user._id.toString(),
+         });
+      }
     }
     if (aError) {
       if ("data" in aError) {
@@ -98,6 +114,11 @@ const CourseContentMedia = ({
       setRating(1);
       courseRefetch();
       toast.success("Đã thêm đánh giá thành công");
+      socketId.emit("notification", {
+          title: "Đánh giá khóa học mới",
+          message: `Bạn có một đánh giá mới từ ${user.name}`,
+          userId: user._id.toString(),
+      });
     }
     if (rError) {
       if ("data" in rError) {
@@ -450,7 +471,6 @@ const CourseContentMedia = ({
   );
 };
 
-// Component con xử lý UI cho comment & reply
 const CommentReply = ({
   data,
   activeVideo,

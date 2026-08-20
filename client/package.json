@@ -28,6 +28,7 @@
     "react-redux": "^9.3.0",
     "recharts": "^3.10.1",
     "timeago.js": "^4.0.2",
+    "socket.io-client": "^4.7.2",
     "yup": "^1.7.1"
   },
   "devDependencies": {

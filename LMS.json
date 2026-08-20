@@ -1,0 +1,302 @@
+{
+	"info": {
+		"name": "LMS MERN Stack - Full API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Users",
+			"item": [
+				{
+					"name": "1. Register User",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"name\": \"Thế Vinh\",\n    \"email\": \"vinhdzai@gmail.com\",\n    \"password\": \"password123\"\n}" },
+						"url": { "raw": "{{url}}/registration", "host": ["{{url}}"], "path": ["registration"] }
+					}
+				},
+				{
+					"name": "2. Activate User",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"activation_token\": \"thay_bang_token_lay_tu_register_nhe\",\n    \"activation_code\": \"123456\"\n}" },
+						"url": { "raw": "{{url}}/activate-user", "host": ["{{url}}"], "path": ["activate-user"] }
+					}
+				},
+				{
+					"name": "3. Login User",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"email\": \"vinhdzai@gmail.com\",\n    \"password\": \"password123\"\n}" },
+						"url": { "raw": "{{url}}/login", "host": ["{{url}}"], "path": ["login"] }
+					}
+				},
+				{
+					"name": "4. Social Auth",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"email\": \"vinhdzai.github@gmail.com\",\n    \"name\": \"Nguyễn Thế Vinh\",\n    \"avatar\": \"https://avatars.githubusercontent.com/u/1234567\"\n}" },
+						"url": { "raw": "{{url}}/social-auth", "host": ["{{url}}"], "path": ["social-auth"] }
+					}
+				},
+				{
+					"name": "5. Get User Info",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/me", "host": ["{{url}}"], "path": ["me"] } }
+				},
+				{
+					"name": "6. Refresh Token",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/refresh", "host": ["{{url}}"], "path": ["refresh"] } }
+				},
+				{
+					"name": "7. Logout",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/logout", "host": ["{{url}}"], "path": ["logout"] } }
+				},
+				{
+					"name": "8. Update User Info",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"name\": \"Vinh MERN Stack Master\"\n}" },
+						"url": { "raw": "{{url}}/update-user-info", "host": ["{{url}}"], "path": ["update-user-info"] }
+					}
+				},
+				{
+					"name": "9. Update Password",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"oldPassword\": \"password123\",\n    \"newPassword\": \"newpassword123\"\n}" },
+						"url": { "raw": "{{url}}/update-user-password", "host": ["{{url}}"], "path": ["update-user-password"] }
+					}
+				},
+				{
+					"name": "10. Update Avatar",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"avatar\": \"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgJCglK...\"\n}" },
+						"url": { "raw": "{{url}}/update-user-avatar", "host": ["{{url}}"], "path": ["update-user-avatar"] }
+					}
+				},
+				{
+					"name": "11. Get All Users (Admin)",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-users", "host": ["{{url}}"], "path": ["get-users"] } }
+				},
+				{
+					"name": "12. Update User Role (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"id\": \"thay_id_user_vao_day\",\n    \"role\": \"admin\"\n}" },
+						"url": { "raw": "{{url}}/update-user", "host": ["{{url}}"], "path": ["update-user"] }
+					}
+				},
+				{
+					"name": "13. Delete User (Admin)",
+					"request": { "method": "DELETE", "url": { "raw": "{{url}}/delete-user/id_user_can_xoa", "host": ["{{url}}"], "path": ["delete-user", "id_user_can_xoa"] } }
+				}
+			]
+		},
+		{
+			"name": "2. Courses",
+			"item": [
+				{
+					"name": "1. Create Course (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"name\": \"Khóa học NextJS 14 Thực chiến\",\n    \"description\": \"Học xây dựng LMS từ A-Z với NextJS 14, NodeJS, Redis, Socket.io...\",\n    \"categories\": \"Programming\",\n    \"price\": 29,\n    \"estimatedPrice\": 99,\n    \"tags\": \"MERN, NextJS\",\n    \"level\": \"Beginner\",\n    \"demoUrl\": \"id_video_vdocipher_bat_ky\",\n    \"thumbnail\": \"data:image/jpeg;base64,/9j/4AAQSkZJRgABA...\",\n    \"benefits\": [{ \"title\": \"Hiểu rõ SSR & CSR\" }],\n    \"prerequisites\": [{ \"title\": \"Biết cơ bản ReactJS\" }],\n    \"courseData\": [\n        {\n            \"title\": \"Cài đặt môi trường\",\n            \"description\": \"Hướng dẫn setup NextJS 14\",\n            \"videoUrl\": \"id_video_vdocipher_bai_giang\",\n            \"videoSection\": \"Chương 1: Mở đầu\",\n            \"videoLength\": 15,\n            \"links\": [{ \"title\": \"Source code\", \"url\": \"https://github.com/ntv2609\" }]\n        }\n    ]\n}" },
+						"url": { "raw": "{{url}}/create-course", "host": ["{{url}}"], "path": ["create-course"] }
+					}
+				},
+				{
+					"name": "2. Edit Course (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"name\": \"Khóa học NextJS 14 Cập nhật 2026\",\n    \"description\": \"Đã update thêm MoMo Payment\",\n    \"categories\": \"Programming\",\n    \"price\": 39,\n    \"estimatedPrice\": 129,\n    \"tags\": \"MERN, NextJS\",\n    \"level\": \"Intermediate\",\n    \"demoUrl\": \"id_video_vdocipher_bat_ky\",\n    \"thumbnail\": \"data:image/jpeg;base64,/9j/4AAQSkZJRgABA...\",\n    \"benefits\": [{ \"title\": \"Làm chủ NextJS 14\" }],\n    \"prerequisites\": [{ \"title\": \"Biết NodeJS\" }],\n    \"courseData\": [\n        {\n            \"title\": \"Tích hợp MoMo\",\n            \"description\": \"Payment Gateway VN\",\n            \"videoUrl\": \"id_video_vdocipher_bai_giang_momo\",\n            \"videoSection\": \"Chương 5: Thanh Toán\",\n            \"videoLength\": 25,\n            \"links\": [{ \"title\": \"Doc MoMo\", \"url\": \"https://developers.momo.vn\" }]\n        }\n    ]\n}" },
+						"url": { "raw": "{{url}}/edit-course/id_cua_khoa_hoc", "host": ["{{url}}"], "path": ["edit-course", "id_cua_khoa_hoc"] }
+					}
+				},
+				{
+					"name": "3. Get All Courses (Public)",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-courses", "host": ["{{url}}"], "path": ["get-courses"] } }
+				},
+				{
+					"name": "4. Get Single Course (Public)",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-course/id_cua_khoa_hoc", "host": ["{{url}}"], "path": ["get-course", "id_cua_khoa_hoc"] } }
+				},
+				{
+					"name": "5. Get Course Content (Purchased)",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-course-content/id_cua_khoa_hoc", "host": ["{{url}}"], "path": ["get-course-content", "id_cua_khoa_hoc"] } }
+				},
+				{
+					"name": "6. Add Question",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"question\": \"Đoạn logic Socket.IO này gọi từ Client sao ạ?\",\n    \"courseId\": \"id_cua_khoa_hoc\",\n    \"contentId\": \"id_cua_video_bai_giang\"\n}" },
+						"url": { "raw": "{{url}}/add-question", "host": ["{{url}}"], "path": ["add-question"] }
+					}
+				},
+				{
+					"name": "7. Add Answer",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"answer\": \"Dùng socket.emit('notification', data) từ client nha bro.\",\n    \"courseId\": \"id_cua_khoa_hoc\",\n    \"contentId\": \"id_cua_video_bai_giang\",\n    \"questionId\": \"id_cua_cau_hoi\"\n}" },
+						"url": { "raw": "{{url}}/add-answer", "host": ["{{url}}"], "path": ["add-answer"] }
+					}
+				},
+				{
+					"name": "8. Add Review",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"rating\": 5,\n    \"review\": \"Khóa học cực cháy! Dạy rất có tâm.\"\n}" },
+						"url": { "raw": "{{url}}/add-review/id_cua_khoa_hoc", "host": ["{{url}}"], "path": ["add-review", "id_cua_khoa_hoc"] }
+					}
+				},
+				{
+					"name": "9. Add Reply to Review (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"comment\": \"Cảm ơn em đã ủng hộ khóa học nhé!\",\n    \"courseId\": \"id_cua_khoa_hoc\",\n    \"reviewId\": \"id_cua_review\"\n}" },
+						"url": { "raw": "{{url}}/add-reply", "host": ["{{url}}"], "path": ["add-reply"] }
+					}
+				},
+				{
+					"name": "10. Get All Courses (Admin)",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-all-courses", "host": ["{{url}}"], "path": ["get-all-courses"] } }
+				},
+				{
+					"name": "11. Delete Course (Admin)",
+					"request": { "method": "DELETE", "url": { "raw": "{{url}}/delete-course/id_cua_khoa_hoc_can_xoa", "host": ["{{url}}"], "path": ["delete-course", "id_cua_khoa_hoc_can_xoa"] } }
+				},
+				{
+					"name": "12. Get VdoCipher OTP",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"videoId\": \"id_video_tren_vdocipher\"\n}" },
+						"url": { "raw": "{{url}}/getVdoCipherOTP", "host": ["{{url}}"], "path": ["getVdoCipherOTP"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Orders",
+			"item": [
+				{
+					"name": "1. Create MoMo Payment",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"courseId\": \"thay_id_khoa_hoc_vao_day\",\n    \"amount\": 290000 \n}" },
+						"url": { "raw": "{{url}}/payment/momo", "host": ["{{url}}"], "path": ["payment", "momo"] }
+					}
+				},
+				{
+					"name": "2. MoMo Webhook (Giả lập MoMo gửi về)",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"partnerCode\": \"MOMO\",\n    \"orderId\": \"MOMO-1700000000000\",\n    \"requestId\": \"MOMO-1700000000000\",\n    \"amount\": \"290000\",\n    \"orderInfo\": \"Thanh toán khóa học\",\n    \"orderType\": \"momo_wallet\",\n    \"transId\": \"2831231231\",\n    \"resultCode\": 0,\n    \"message\": \"Success\",\n    \"payType\": \"qr\",\n    \"responseTime\": \"1700000000000\",\n    \"extraData\": \"courseId=ID_KHOA_HOC_CUA_ONG&userId=ID_USER_CUA_ONG\",\n    \"signature\": \"day_la_chu_ky_gia_lap_neu_test_thuc_te_phai_khop_chu_ky\"\n}" },
+						"url": { "raw": "{{url}}/payment/webhook", "host": ["{{url}}"], "path": ["payment", "webhook"] }
+					}
+				},
+				{
+					"name": "3. Get All Orders (Admin)",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-orders", "host": ["{{url}}"], "path": ["get-orders"] } }
+				}
+			]
+		},
+		{
+			"name": "4. Notifications",
+			"item": [
+				{
+					"name": "1. Get All Notifications (Admin)",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-all-notifications", "host": ["{{url}}"], "path": ["get-all-notifications"] } }
+				},
+				{
+					"name": "2. Update Notification Status (Admin)",
+					"request": { "method": "PUT", "url": { "raw": "{{url}}/update-notification/id_thong_bao", "host": ["{{url}}"], "path": ["update-notification", "id_thong_bao"] } }
+				}
+			]
+		},
+		{
+			"name": "5. Analytics",
+			"item": [
+				{
+					"name": "1. Get Users Analytics (Admin)",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-users-analytics", "host": ["{{url}}"], "path": ["get-users-analytics"] } }
+				},
+				{
+					"name": "2. Get Courses Analytics (Admin)",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-courses-analytics", "host": ["{{url}}"], "path": ["get-courses-analytics"] } }
+				},
+				{
+					"name": "3. Get Orders Analytics (Admin)",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-orders-analytics", "host": ["{{url}}"], "path": ["get-orders-analytics"] } }
+				}
+			]
+		},
+		{
+			"name": "6. Layouts",
+			"item": [
+				{
+					"name": "1a. Create Layout (Banner)",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"type\": \"Banner\",\n    \"image\": \"data:image/png;base64,...\",\n    \"title\": \"Khám phá tương lai với ELearning\",\n    \"subTitle\": \"Nền tảng học lập trình thực chiến đỉnh cao nhất vũ trụ\"\n}" },
+						"url": { "raw": "{{url}}/create-layout", "host": ["{{url}}"], "path": ["create-layout"] }
+					}
+				},
+				{
+					"name": "1b. Create Layout (FAQ)",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"type\": \"FAQ\",\n    \"faq\": [\n        {\n            \"question\": \"Học xong có cam kết việc làm không?\",\n            \"answer\": \"Bên mình chỉ cam kết kiến thức. Có việc làm hay không phụ thuộc vào nỗ lực của bro nhé!\"\n        },\n        {\n            \"question\": \"Mua một lần học được bao lâu?\",\n            \"answer\": \"Học trọn đời luôn bro, update free nữa!\"\n        }\n    ]\n}" },
+						"url": { "raw": "{{url}}/create-layout", "host": ["{{url}}"], "path": ["create-layout"] }
+					}
+				},
+				{
+					"name": "1c. Create Layout (Categories)",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"type\": \"Categories\",\n    \"categories\": [\n        { \"title\": \"Programming\" },\n        { \"title\": \"Machine Learning\" },\n        { \"title\": \"Data Science\" },\n        { \"title\": \"Design\" }\n    ]\n}" },
+						"url": { "raw": "{{url}}/create-layout", "host": ["{{url}}"], "path": ["create-layout"] }
+					}
+				},
+				{
+					"name": "2. Edit Layout (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": { "mode": "raw", "raw": "{\n    \"type\": \"Banner\",\n    \"image\": \"data:image/png;base64,...\",\n    \"title\": \"Update Tiêu đề cực bốc\",\n    \"subTitle\": \"Vừa update subtitle cho banner.\"\n}" },
+						"url": { "raw": "{{url}}/edit-layout", "host": ["{{url}}"], "path": ["edit-layout"] }
+					}
+				},
+				{
+					"name": "3. Get Layout",
+					"request": { "method": "GET", "url": { "raw": "{{url}}/get-layout/Banner", "host": ["{{url}}"], "path": ["get-layout", "Banner"] } }
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:8000/api/v1",
+			"type": "string"
+		}
+	]
+}

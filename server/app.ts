@@ -10,6 +10,7 @@ import orderRouter from "./routes/order.route";
 import notificationRouter from "./routes/notification.route";
 import analyticsRouter from "./routes/analytics.route";
 import layoutRouter from "./routes/layout.route";
+import { rateLimit } from 'express-rate-limit';
 
 //body parser
 app.use(express.json({ limit: "50mb" }));
@@ -18,13 +19,20 @@ app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 
 //cors => cross origin resource sharing
-// FIX BUG: Fix cứng tên miền frontend vào đây để trị dứt điểm lỗi CORS
 app.use(
   cors({
     origin: ['http://localhost:3000'],
     credentials: true,
   }),
 );
+
+// api requests limit to protect against DDoS
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per window
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+});
 
 //routes
 app.use("/api/v1/", userRouter);
@@ -49,4 +57,5 @@ app.all(/.*/, (req: Request, res: Response, next: NextFunction) => {
   next(err);
 });
 
+app.use(limiter);
 app.use(ErrorMiddleware);
