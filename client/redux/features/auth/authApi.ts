@@ -1,5 +1,5 @@
 import { apiSlice } from "../api/apiSlice";
-import { userRegistration, userLoggedIn } from "./authSlice";
+import { userRegistration, userLoggedIn, userLoggedOut } from "./authSlice";
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -8,13 +8,27 @@ export const authApi = apiSlice.injectEndpoints({
         url: "registration",
         method: "POST",
         body: data,
+        credentials: "include",
       }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const result = await queryFulfilled;
+          dispatch(
+            userRegistration({
+              token: result.data.activationToken,
+            })
+          );
+        } catch (error) {
+          console.log(error);
+        }
+      },
     }),
     activation: builder.mutation({
       query: (data) => ({
         url: "activate-user",
         method: "POST",
         body: data,
+        credentials: "include",
       }),
     }),
     login: builder.mutation({
@@ -22,6 +36,7 @@ export const authApi = apiSlice.injectEndpoints({
         url: "login",
         method: "POST",
         body: data,
+        credentials: "include",
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
@@ -42,6 +57,7 @@ export const authApi = apiSlice.injectEndpoints({
         url: "social-auth",
         method: "POST",
         body: data,
+        credentials: "include",
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
@@ -57,6 +73,20 @@ export const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
+    logout: builder.query({
+      query: () => ({
+        url: "logout",
+        method: "GET",
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(userLoggedOut());
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    }),
   }),
 });
 
@@ -65,4 +95,5 @@ export const {
   useActivationMutation,
   useLoginMutation,
   useSocialAuthMutation,
+  useLogoutQuery,
 } = authApi;

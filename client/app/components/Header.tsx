@@ -10,7 +10,7 @@ import SignUp from "./Auth/SignUp";
 import Verification from "./Auth/Verification";
 import { useSelector } from "react-redux";
 import { useSession } from "next-auth/react";
-import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import { useSocialAuthMutation, useLogoutQuery } from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
 
 interface Props {
@@ -26,7 +26,12 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const [openSidebar, setOpenSidebar] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
   const { data } = useSession();
-  const [socialAuth, { isSuccess }] = useSocialAuthMutation();
+  const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
+  const [logout, setLogout] = useState(false);
+
+  const {} = useLogoutQuery(undefined, {
+    skip: !logout ? true : false,
+  });
 
   useEffect(() => {
     if (!user) {
@@ -38,10 +43,23 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
         });
       }
     }
-    if (isSuccess) {
-      toast.success("Login Successful");
+    if (data === null && isSuccess) {
+      setLogout(true);
     }
-  }, [data, user, isSuccess, socialAuth]);
+    if (data !== null) {
+      if (isSuccess) {
+        toast.success("Login Successful");
+        setOpen(false);
+      }
+    }
+  }, [data, user, isSuccess, socialAuth, setOpen]);
+
+  useEffect(() => {
+    if (error) {
+      console.error("Lỗi từ backend khi đồng bộ Social Auth:", error);
+      toast.error("Lỗi đồng bộ tài khoản với Server! Mở F12 xem chi tiết.");
+    }
+  }, [error]);
 
   if (typeof window !== "undefined") {
     window.addEventListener("scroll", () => {
@@ -95,7 +113,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                     <img
                       src={user.avatar ? user.avatar.url : "/assets/avatar.png"}
                       alt="User Avatar"
-                      className="w-[30px] h-[30px] rounded-full cursor-pointer"
+                      className="w-[30px] h-[30px] rounded-full cursor-pointer border-[2px] border-[#37a39a]"
                     />
                   </Link>
                 ) : (
@@ -123,7 +141,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
                   <img
                     src={user.avatar ? user.avatar.url : "/assets/avatar.png"}
                     alt="User Avatar"
-                    className="w-[30px] h-[30px] rounded-full cursor-pointer ml-[20px]"
+                    className="w-[30px] h-[30px] rounded-full cursor-pointer ml-[20px] border-[2px] border-[#37a39a]"
                   />
                 </Link>
               ) : (

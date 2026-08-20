@@ -9,6 +9,7 @@ import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
 import { getAllOrdersService, newOrder } from "../services/order.service";
+import { redis } from "../utils/redis";
 
 // create order
 export const createOrder = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
@@ -70,7 +71,7 @@ export const createOrder = CatchAsyncErrors(async (req: Request, res: Response, 
         await user?.save();
 
         await NotificationModel.create({
-            user: user?._id.toString(),
+            userId: user?._id.toString(),
             title: "Đơn hàng mới",
             message: `Bạn có một đơn hàng mới từ khóa học: ${course?.name}`,
         });

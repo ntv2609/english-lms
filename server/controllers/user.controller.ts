@@ -284,34 +284,34 @@ export const socialAuth = CatchAsyncErrors(
   },
 );
 
-// update user info
+// update user info (Đã refactor theo tutorial - loại bỏ email)
 interface IUpdateUserInfo {
   name?: string;
-  email?: string;
 }
 
 export const updateUserInfo = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, email } = req.body as IUpdateUserInfo;
+      const { name } = req.body as IUpdateUserInfo;
       const userId = req.user?._id;
-      const user = await userModel.findById(userId);
-
-      if (email && user) {
-        const isEmailExist = await userModel.findOne({ email });
-        if (isEmailExist) {
-          return next(new ErrorHandler("Email already exist", 400));
-        }
-        user.email = email;
+      
+      if (!userId) {
+          return next(new ErrorHandler("User ID not found", 400));
       }
 
-      if (name && user) {
+      const user = await userModel.findById(userId.toString());
+
+      if (!user) {
+          return next(new ErrorHandler("User not found", 404));
+      }
+
+      if (name) {
         user.name = name;
       }
 
-      await user?.save();
+      await user.save();
 
-      await redis.set(userId?.toString() as string, JSON.stringify(user));
+      await redis.set(userId.toString(), JSON.stringify(user));
 
       res.status(201).json({
         success: true,
@@ -405,7 +405,9 @@ export const updateProfilePicture = CatchAsyncErrors(async(req:Request,res:Respo
 
         await user?.save();
 
-        await redis.set(userId?.toString() as string, JSON.stringify(user));
+        if(userId) {
+             await redis.set(userId.toString(), JSON.stringify(user));
+        }
 
         res.status(200).json({
             success: true,

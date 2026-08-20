@@ -18,9 +18,10 @@ app.use(express.json({ limit: "50mb" }));
 app.use(cookieParser());
 
 //cors => cross origin resource sharing
+// FIX BUG: Fix cứng tên miền frontend vào đây để trị dứt điểm lỗi CORS
 app.use(
   cors({
-    origin: process.env.ORIGIN ? process.env.ORIGIN.split(',') : ['http://localhost:3000'],
+    origin: ['http://localhost:3000'],
     credentials: true,
   }),
 );
