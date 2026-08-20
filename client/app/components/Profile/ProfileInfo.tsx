@@ -14,8 +14,15 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
   const [name, setName] = useState(user && user.name);
   const [updateAvatar, { isSuccess, error }] = useUpdateAvatarMutation();
   const [editProfile, { isSuccess: success, error: updateError }] = useEditProfileMutation();
-  const [loadUser, setLoadUser] = useState(false);
-  const {} = useLoadUserQuery(undefined, { skip: !loadUser ? true : false });
+  
+  const { refetch } = useLoadUserQuery(undefined, {});
+
+  // FIX BUG: Cập nhật lại input name nếu thông tin user từ store thay đổi
+  useEffect(() => {
+    if (user) {
+      setName(user.name);
+    }
+  }, [user]);
 
   const imageHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -35,20 +42,24 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
 
   useEffect(() => {
     if (isSuccess) {
-      setLoadUser(true);
+      refetch();
       toast.success('Profile picture updated successfully!');
     }
     if (error) {
       console.log(error);
+      const errData = error as any;
+      toast.error(errData?.data?.message || "Lỗi cập nhật ảnh đại diện!");
     }
     if (success) {
+      refetch();
       toast.success('Profile updated successfully!');
-      setLoadUser(true);
     }
     if (updateError) {
       console.log(updateError);
+      const errData = updateError as any;
+      toast.error(errData?.data?.message || "Lỗi cập nhật thông tin!");
     }
-  }, [isSuccess, error, success, updateError]);
+  }, [isSuccess, error, success, updateError, refetch]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

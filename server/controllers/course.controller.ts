@@ -10,6 +10,7 @@ import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.model";
+import axios from "axios";
 
 // upload course
 export const uploadCourse = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
@@ -42,7 +43,7 @@ export const editCourse = CatchAsyncErrors(async (req: Request, res: Response, n
         const courseId = req.params.id;
 
         // Nếu có cập nhật thumbnail mới
-        if (thumbnail) {
+        if (thumbnail && !thumbnail.startsWith("https")) {
             // Xóa thumbnail cũ trên Cloudinary
             const courseData = await CourseModel.findById(courseId) as any;
             if(courseData?.thumbnail?.public_id) {
@@ -56,6 +57,13 @@ export const editCourse = CatchAsyncErrors(async (req: Request, res: Response, n
             data.thumbnail = {
                 public_id: myCloud.public_id,
                 url: myCloud.secure_url,
+            };
+        } else if (thumbnail && thumbnail.startsWith("https")) {
+             // Giữ nguyên ảnh cũ nếu user không thay đổi
+            const courseData = await CourseModel.findById(courseId) as any;
+            data.thumbnail = {
+                public_id: courseData?.thumbnail.public_id,
+                url: courseData?.thumbnail.url,
             };
         }
 
@@ -412,5 +420,32 @@ export const deleteCourse = CatchAsyncErrors(async (req: Request, res: Response,
         });
     } catch (error: any) {
         return next(new ErrorHandler(error.message, 500));
+    }
+});
+
+// Generate video URL (VdoCipher)
+export const generateVideoUrl = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { videoId } = req.body;
+        
+        if (!videoId) {
+            return next(new ErrorHandler("Video ID là bắt buộc", 400));
+        }
+
+        const response = await axios.post(
+            `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
+            { ttl: 300 },
+            {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                    Authorization: `Apisecret ${process.env.VDOCIPHER_API_SECRET}`,
+                },
+            }
+        );
+
+        res.json(response.data);
+    } catch (error: any) {
+        return next(new ErrorHandler(error.message, 400));
     }
 });

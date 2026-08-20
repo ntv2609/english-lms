@@ -1,0 +1,1 @@
+declare module 'react-pro-sidebar/dist/css/styles.css';

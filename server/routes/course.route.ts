@@ -1,41 +1,46 @@
 import express from "express";
 import {
-  uploadCourse,
-  editCourse,
-  getSingleCourse,
-  getAllCourses,
-  getCourseByUser,
-  addQuestion,
-  addAnswer,
-  addReview,
-  addReplyToReview,
-  getAllCoursesAdmin,
-  deleteCourse
+    uploadCourse,
+    editCourse,
+    getSingleCourse,
+    getAllCourses,
+    getCourseByUser,
+    addQuestion,
+    addAnswer,
+    addReview,
+    addReplyToReview,
+    getAllCoursesAdmin,
+    deleteCourse,
+    generateVideoUrl
 } from "../controllers/course.controller";
 import { authorizeRoles, isAuthenticated } from "../middleware/auth";
+import { updateAccessToken } from "../controllers/user.controller"; // Gọi vào để chống lỗi Token Expired
 
 const courseRouter = express.Router();
 
-courseRouter.post("/create-course", isAuthenticated, authorizeRoles("admin"), uploadCourse);
+// Tích hợp middleware updateAccessToken trước isAuthenticated để chống việc user nhập form lâu bị mất session
+courseRouter.post("/create-course", updateAccessToken, isAuthenticated, authorizeRoles("admin"), uploadCourse);
 
-courseRouter.put("/edit-course/:id", isAuthenticated, authorizeRoles("admin"), editCourse);
+courseRouter.put("/edit-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("admin"), editCourse);
 
 courseRouter.get("/get-course/:id", getSingleCourse);
 
 courseRouter.get("/get-courses", getAllCourses);
 
-courseRouter.get("/get-course-content/:id", isAuthenticated, getCourseByUser);
+courseRouter.get("/get-course-content/:id", updateAccessToken, isAuthenticated, getCourseByUser);
 
-courseRouter.put("/add-question", isAuthenticated, addQuestion);
+courseRouter.put("/add-question", updateAccessToken, isAuthenticated, addQuestion);
 
-courseRouter.put("/add-answer", isAuthenticated, addAnswer);
+courseRouter.put("/add-answer", updateAccessToken, isAuthenticated, addAnswer);
 
-courseRouter.put("/add-review/:id", isAuthenticated, addReview);
+courseRouter.put("/add-review/:id", updateAccessToken, isAuthenticated, addReview);
 
-courseRouter.put("/add-reply", isAuthenticated, authorizeRoles("admin"), addReplyToReview);
+courseRouter.put("/add-reply", updateAccessToken, isAuthenticated, authorizeRoles("admin"), addReplyToReview);
 
-courseRouter.get("/get-all-courses", isAuthenticated, authorizeRoles("admin"), getAllCoursesAdmin);
+courseRouter.get("/get-all-courses", updateAccessToken, isAuthenticated, authorizeRoles("admin"), getAllCoursesAdmin);
 
-courseRouter.delete("/delete-course/:id", isAuthenticated, authorizeRoles("admin"), deleteCourse);
+courseRouter.post("/getVdoCipherOTP", generateVideoUrl);
+
+courseRouter.delete("/delete-course/:id", updateAccessToken, isAuthenticated, authorizeRoles("admin"), deleteCourse);
 
 export default courseRouter;
