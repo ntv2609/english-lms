@@ -15,7 +15,18 @@ export const ordersApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    createMoMoPayment: builder.mutation({
+      query: (paymentInfo) => ({
+        url: "payment/momo",
+        method: "POST",
+        body: paymentInfo,
+      }),
+    }),
   }),
 });
 
-export const { useCreateOrderMutation, useGetAllOrdersQuery } = ordersApi;
+export const { 
+    useCreateOrderMutation, 
+    useGetAllOrdersQuery, 
+    useCreateMoMoPaymentMutation 
+} = ordersApi;
