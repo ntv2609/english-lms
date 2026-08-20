@@ -1,9 +1,10 @@
 "use client";
 import React, { FC } from "react";
-import { Heading } from "../utils/Heading";
-import AdminProtected from "../hooks/adminProtected";
-import AdminSidebar from "../components/Admin/sidebar/AdminSidebar";
-import DashboardHero from "../components/Admin/DashboardHero";
+import AdminProtected from "../../hooks/adminProtected";
+import { Heading } from "../../utils/Heading";
+import AdminSidebar from "../../components/Admin/sidebar/AdminSidebar";
+import DashboardHeader from "../../components/Admin/DashboardHeader";
+import OrderAnalytics from "../../components/Admin/Analytics/OrderAnalytics";
 
 interface Props {}
 
@@ -21,7 +22,8 @@ const Page: FC<Props> = (props) => {
             <AdminSidebar />
           </div>
           <div className="w-[85%]">
-            <DashboardHero isDashboard={true} />
+            <DashboardHeader />
+            <OrderAnalytics />
           </div>
         </div>
       </AdminProtected>

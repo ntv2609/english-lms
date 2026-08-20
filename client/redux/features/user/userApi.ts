@@ -7,7 +7,7 @@ export const userApi = apiSlice.injectEndpoints({
         url: 'update-user-avatar',
         method: 'PUT',
         body: { avatar },
-        credentials: 'include', // <--- QUAN TRỌNG: Gửi kèm token
+        credentials: 'include',
       }),
     }),
     editProfile: builder.mutation({
@@ -15,7 +15,7 @@ export const userApi = apiSlice.injectEndpoints({
         url: 'update-user-info',
         method: 'PUT',
         body: { name },
-        credentials: 'include', // <--- QUAN TRỌNG: Gửi kèm token
+        credentials: 'include',
       }),
     }),
     updatePassword: builder.mutation({
@@ -23,10 +23,39 @@ export const userApi = apiSlice.injectEndpoints({
         url: 'update-user-password',
         method: 'PUT',
         body: { oldPassword, newPassword },
-        credentials: 'include', // <--- QUAN TRỌNG: Gửi kèm token
+        credentials: 'include',
+      }),
+    }),
+    getAllUsers: builder.query({
+      query: () => ({
+        url: "get-users",
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    updateUserRole: builder.mutation({
+      query: ({ id, role }) => ({
+        url: "update-user",
+        method: "PUT",
+        body: { id, role },
+        credentials: "include",
+      }),
+    }),
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `delete-user/${id}`,
+        method: "DELETE",
+        credentials: "include",
       }),
     }),
   }),
 });
 
-export const { useUpdateAvatarMutation, useEditProfileMutation, useUpdatePasswordMutation } = userApi;
+export const { 
+  useUpdateAvatarMutation, 
+  useEditProfileMutation, 
+  useUpdatePasswordMutation, 
+  useGetAllUsersQuery, 
+  useUpdateUserRoleMutation, 
+  useDeleteUserMutation 
+} = userApi;
