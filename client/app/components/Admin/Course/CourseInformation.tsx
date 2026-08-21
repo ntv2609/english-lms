@@ -40,7 +40,7 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
           </div>
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className={styles.label}>Giá bán (USD)</label>
+              <label className={styles.label}>Giá bán (VNĐ)</label>
               <input type="number" required className={styles.input} value={courseInfo.price} onChange={(e) => setCourseInfo({ ...courseInfo, price: e.target.value })} />
             </div>
             <div>
@@ -67,14 +67,20 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
               <input type="text" required className={styles.input} value={courseInfo.level} onChange={(e) => setCourseInfo({ ...courseInfo, level: e.target.value })} placeholder="Beginner / Intermediate / Advanced" />
             </div>
             <div>
-              <label className={styles.label}>Demo Video ID (VdoCipher)</label>
+              <label className={styles.label}>Demo Video ID</label>
               <input type="text" required className={styles.input} value={courseInfo.demoUrl} onChange={(e) => setCourseInfo({ ...courseInfo, demoUrl: e.target.value })} />
             </div>
           </div>
           <div>
             <label className={styles.label}>Ảnh đại diện khóa học (Thumbnail)</label>
             <input type="file" id="file" className="hidden" accept="image/*" onChange={handleFile} />
-            <label htmlFor="file" onDragOver={(e){e.preventDefault(); setDragging(true)}} onDragLeave={(e){e.preventDefault(); setDragging(false)}} onDrop={(e){e.preventDefault(); setDragging(false); handleFile(e)}} className={`mt-2 flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${dragging ? "border-blue-500 bg-blue-500/10" : "border-black/20 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5"}`}>
+            <label 
+              htmlFor="file" 
+              onDragOver={(e) => { e.preventDefault(); setDragging(true); }} 
+              onDragLeave={(e) => { e.preventDefault(); setDragging(false); }} 
+              onDrop={(e) => { e.preventDefault(); setDragging(false); handleFile(e); }} 
+              className={`mt-2 flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${dragging ? "border-blue-500 bg-blue-500/10" : "border-black/20 dark:border-white/20 hover:bg-black/5 dark:hover:bg-white/5"}`}
+            >
               {courseInfo.thumbnail ? (
                 <img src={courseInfo.thumbnail} className="w-full h-full object-cover rounded-lg" alt="thumbnail" />
               ) : (
