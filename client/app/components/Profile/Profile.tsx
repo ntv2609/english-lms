@@ -6,9 +6,8 @@ import ProfileInfo from "./ProfileInfo";
 import ChangePassword from "./ChangePassword";
 import CourseCard from "../Course/CourseCard";
 import { useGetUsersAllCoursesQuery } from "@/redux/features/courses/coursesApi";
-import { useDispatch } from "react-redux";
-import { userLoggedOut } from "@/redux/features/auth/authSlice";
-import { apiSlice } from "@/redux/features/api/apiSlice"; // Thêm dòng này để xóa tận gốc cache RTK Query
+import { useDispatch } from "react-redux"; // <--- Import useDispatch
+import { userLoggedOut } from "@/redux/features/auth/authSlice"; // <--- Import userLoggedOut
 
 type Props = { user: any; };
 
@@ -16,27 +15,25 @@ const Profile: FC<Props> = ({ user }) => {
   const [active, setActive] = useState(1);
   const [courses, setCourses] = useState<any[]>([]);
   const { data } = useGetUsersAllCoursesQuery(undefined, {});
+  
+  // Khởi tạo dispatch để dùng Redux
   const dispatch = useDispatch();
 
   const logOutHandler = async () => { 
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SERVER_URI}/logout`, {
-        method: 'POST', 
-        credentials: 'include',
-        cache: 'no-store'
+        method: 'POST', // Đổi thành POST
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include', 
+        cache: 'no-store' 
       });
       
-      // BƯỚC 1: Hủy diệt user state trong Redux
       dispatch(userLoggedOut()); 
-      
-      // BƯỚC 2: Hủy diệt TOÀN BỘ cache rác của RTK Query (loadUser, fetchCourses...)
-      dispatch(apiSlice.util.resetApiState());
-      
-      // BƯỚC 3: Dọn session mạng xã hội
       await signOut({ redirect: false }); 
       
-      // BƯỚC 4: Dùng replace để văng trang, người dùng ấn nút Back không thể quay lại trang profile cũ được nữa
-      window.location.replace("/"); 
+      window.location.href = "/";
     } catch (error) {
       console.log("Lỗi xóa cookie backend:", error);
     }
