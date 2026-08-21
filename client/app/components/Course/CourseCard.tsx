@@ -34,14 +34,15 @@ const CourseCard: FC<Props> = ({ item, isProfile }) => {
             <div className="flex items-center justify-between pt-4 border-t border-black/5 dark:border-white/5">
               <div className="flex items-baseline gap-2">
                 <span className="font-mono text-lg font-bold text-black dark:text-white">
-                  {item.price === 0 ? "Free" : `$${item.price}`}
+                  {/* Chuyển đổi định dạng tiền tệ VNĐ ở đây */}
+                  {item.price === 0 ? "Miễn phí" : `${item.price.toLocaleString('vi-VN')} VNĐ`}
                 </span>
-                {item.estimatedPrice && <span className="font-mono text-xs text-neutral-400 line-through">${item.estimatedPrice}</span>}
+                {item.estimatedPrice && <span className="font-mono text-xs text-neutral-400 line-through">{item.estimatedPrice.toLocaleString('vi-VN')} VNĐ</span>}
               </div>
               
               <div className="flex items-center gap-4 text-xs font-medium text-neutral-500">
-                <span className="flex items-center gap-1"><AiOutlineUnorderedList /> {item.courseData?.length || 0} Lss.</span>
-                {!isProfile && <span>{item.purchased || 0} Std.</span>}
+                <span className="flex items-center gap-1"><AiOutlineUnorderedList /> {item.courseData?.length || 0} Bài</span>
+                {!isProfile && <span>{item.purchased || 0} Học viên</span>}
               </div>
             </div>
           </div>

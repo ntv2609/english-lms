@@ -37,8 +37,9 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   }, []);
 
   return (
-    <div className="w-full relative z-[99]">
-      <div className={`fixed top-0 left-0 w-full transition-all duration-300 ${active ? "bg-white/80 dark:bg-[#0A0A0A]/80 backdrop-blur-md border-b border-black/5 dark:border-white/5 py-3" : "bg-transparent py-5"}`}>
+    /* ĐÃ SỬA: Thay relative + fixed bằng sticky để Navbar tự đẩy nội dung xuống */
+    <div className="w-full sticky top-0 z-[999] transition-all duration-300">
+      <div className={`w-full transition-all duration-300 ${active ? "bg-white/90 dark:bg-[#0A0A0A]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 py-3" : "bg-white dark:bg-[#050505] py-5 border-b border-transparent"}`}>
         <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="text-2xl font-Josefin font-bold tracking-tighter text-black dark:text-white">EngGo<span className="text-blue-500">.</span></Link>
           

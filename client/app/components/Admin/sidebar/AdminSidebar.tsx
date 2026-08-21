@@ -7,25 +7,26 @@ import { HomeOutlinedIcon, PeopleOutlinedIcon, ReceiptOutlinedIcon, BarChartOutl
 import { useSelector } from "react-redux";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation"; // Thêm useRouter vào đây
 
 interface ItemProps { title: string; to: string; icon: React.ReactNode; active: boolean; }
-
-const Item: FC<ItemProps> = ({ title, to, icon, active }) => (
-  <MenuItem active={active} icon={icon}>
-    <Typography className="!font-Poppins !text-[13px] !font-medium tracking-wide">{title}</Typography>
-    <Link href={to} />
-  </MenuItem>
-);
 
 const AdminSidebar: FC = () => {
   const { user } = useSelector((state: any) => state.auth);
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
   const pathname = usePathname();
+  const router = useRouter(); // Khởi tạo router
 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
+
+  // ĐÃ SỬA LỖI F5: Bỏ thẻ <Link> ảo đi và dùng sự kiện onClick gọi router.push(to)
+  const Item: FC<ItemProps> = ({ title, to, icon, active }) => (
+    <MenuItem active={active} icon={icon} onClick={() => router.push(to)}>
+      <Typography className="!font-Poppins !text-[13px] !font-medium tracking-wide">{title}</Typography>
+    </MenuItem>
+  );
 
   return (
     <Box sx={{

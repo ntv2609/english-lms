@@ -26,7 +26,8 @@ const DashboardHeader: FC<Props> = ({ open, setOpen }) => {
   }, [refetch]);
 
   return (
-    <div className="w-full flex items-center justify-end px-8 py-4 fixed top-0 right-0 z-50 bg-white/80 dark:bg-[#0A0A0A]/80 backdrop-blur-md border-b border-black/5 dark:border-white/5 h-[80px]">
+    /* ĐÃ SỬA: Đổi fixed thành sticky top-0, xóa right-0 */
+    <div className="w-full flex items-center justify-end px-8 py-4 sticky top-0 z-[99] bg-white/90 dark:bg-[#0A0A0A]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 h-[80px]">
       <div className="flex items-center gap-4">
         <ThemeSwitcher />
         <div className="relative cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onClick={() => setOpen(!open)}>
