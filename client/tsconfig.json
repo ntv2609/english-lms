@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "esnext",
     "lib": [
       "dom",
       "dom.iterable",
@@ -22,8 +23,9 @@
       }
     ],
     "strictNullChecks": true,
-    "types": ["node"],
-    // THÊM ĐOẠN NÀY VÀO ĐÂY:
+    "types": [
+      "node"
+    ],
     "paths": {
       "@/*": ["./*"]
     }
