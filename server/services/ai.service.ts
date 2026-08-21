@@ -8,7 +8,7 @@ export const requestGeminiCompletion = async (prompt: string): Promise<string> =
         throw new ErrorHandler("Missing GEMINI_API_KEY in environment variables", 500);
     }
 
-    // Chuyển sang gemini-2.5-flash với endpoint v1beta chuẩn
+    // Sử dụng model chính thức đang hoạt động: gemini-2.5-flash
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     try {
@@ -20,6 +20,11 @@ export const requestGeminiCompletion = async (prompt: string): Promise<string> =
                 topP: 0.95,
                 maxOutputTokens: 2048,
             }
+        }, {
+            headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": apiKey
+            }
         });
 
         if (response.data && response.data.candidates && response.data.candidates.length > 0) {
@@ -27,8 +32,8 @@ export const requestGeminiCompletion = async (prompt: string): Promise<string> =
         }
         throw new ErrorHandler("No valid response from Gemini API", 500);
     } catch (error: any) {
-        console.error("Gemini API Error:", error.response?.data || error.message);
-        throw new ErrorHandler("Lỗi khi kết nối với hệ thống AI", 500);
+        console.error("Gemini API Error Detail:", error.response?.data || error.message);
+        throw new ErrorHandler(`Lỗi AI: ${error.response?.data?.error?.message || error.message || "Không thể kết nối"}`, 500);
     }
 };
 

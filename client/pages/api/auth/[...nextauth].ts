@@ -13,7 +13,8 @@ export const authOptions = {
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
     }),
   ],
-  secret: process.env.SECRET || "",
+  // FIX LỖI OAUTH: Thêm fallback cứng để mã hóa luôn thành công
+  secret: process.env.NEXTAUTH_SECRET || process.env.SECRET || "enggo_super_secret_key_123_456_789",
 };
 
 export default NextAuth(authOptions);

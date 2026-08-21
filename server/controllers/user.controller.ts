@@ -177,11 +177,26 @@ export const loginUser = CatchAsyncErrors(
 export const logoutUser = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.cookie("access_token", "", { maxAge: 1 });
-      res.cookie("refresh_token", "", { maxAge: 1 });
+      const isProduction = process.env.NODE_ENV === "production";
+      
+      // FIX LỖI COOKIE KHÔNG XÓA: Phải truyền đúng cờ bảo mật thì trình duyệt mới chịu hủy Cookie
+      res.cookie("access_token", "", { 
+        maxAge: 1, 
+        httpOnly: true, 
+        sameSite: isProduction ? "none" : "lax", 
+        secure: isProduction 
+      });
+      res.cookie("refresh_token", "", { 
+        maxAge: 1, 
+        httpOnly: true, 
+        sameSite: isProduction ? "none" : "lax", 
+        secure: isProduction 
+      });
+      
       const userId = req.user?._id || "";
 
-      redis.del(userId.toString());
+      // Dùng await để đảm bảo Redis xóa session dứt điểm
+      await redis.del(userId.toString());
 
       res.status(200).json({
         success: true,
@@ -192,7 +207,6 @@ export const logoutUser = CatchAsyncErrors(
     }
   },
 );
-
 // update access token
 export const updateAccessToken = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {

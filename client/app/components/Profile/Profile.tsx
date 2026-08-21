@@ -15,9 +15,21 @@ const Profile: FC<Props> = ({ user }) => {
   const [logout, setLogout] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
   const { data } = useGetUsersAllCoursesQuery(undefined, {});
-  useLogoutQuery(undefined, { skip: !logout });
+  
+  // Hook gọi API xóa Cookie từ backend
+  const { isSuccess: logoutSuccess } = useLogoutQuery(undefined, { skip: !logout });
 
-  const logOutHandler = async () => { setLogout(true); await signOut(); };
+  // FIX LỖI RACE CONDITION: Đợi Backend báo thành công thì mới đá về trang chủ
+  useEffect(() => {
+    if (logoutSuccess) {
+      signOut({ callbackUrl: "/" });
+    }
+  }, [logoutSuccess]);
+
+  const logOutHandler = () => { 
+    // Kích hoạt biến logout để RTK Query gọi API xuống server
+    setLogout(true); 
+  };
 
   useEffect(() => {
     if (data && user?.courses) {
