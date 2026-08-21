@@ -21,7 +21,7 @@ app.use(cookieParser());
 //cors => cross origin resource sharing
 app.use(
   cors({
-    origin: ['http://localhost:3000', ''],
+    origin: ['http://localhost:3000', 'https://english-lms-one.vercel.app', 'https://english-lms-ntv2609s-projects.vercel.app/'],
     credentials: true,
   }),
 );

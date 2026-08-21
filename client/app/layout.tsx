@@ -7,11 +7,9 @@ import { Providers } from "../redux/Provider";
 import { SessionProvider } from "next-auth/react";
 import React, { useEffect } from "react";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
-import Loader from "./components/Loader/Loader";
 import socketIO from "socket.io-client";
 
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
-const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-Poppins" });
 const josefin = Josefin_Sans({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--font-Josefin" });
@@ -19,7 +17,7 @@ const josefin = Josefin_Sans({ subsets: ["latin"], weight: ["400", "600", "700"]
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.variable} ${josefin.variable} font-Poppins`}>
+      <body className={`${poppins.variable} ${josefin.variable} font-Poppins`} suppressHydrationWarning>
         <Providers>
           <SessionProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -34,7 +32,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 
 const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isLoading } = useLoadUserQuery(undefined, {});
-  useEffect(() => { socketId.on("connection", () => {}); }, []);
-  return <>{isLoading ? <Loader /> : <>{children}</>}</>;
+  // Gọi hook loadUser ngầm để cập nhật Redux State khi mở trang
+  useLoadUserQuery(undefined, {});
+
+  useEffect(() => {
+    // 1. Tắt tính năng tự động ghi nhớ vị trí cuộn của trình duyệt
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    // 2. Ép trang web luôn cuộn lên trên cùng mỗi khi F5
+    window.scrollTo(0, 0);
+
+    // Khởi tạo Socket
+    const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
+    socketId.on("connection", () => {});
+
+    return () => {
+      socketId.disconnect();
+    };
+  }, []);
+
+  // Luôn trả về children để Server và Client đồng bộ HTML chuẩn SSR
+  return <>{children}</>;
 };

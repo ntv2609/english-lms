@@ -18,11 +18,16 @@ interface Props { open: boolean; setOpen: (open: boolean) => void; activeItem: n
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
+  const [mounted, setMounted] = useState(false); // Cờ chống lỗi Hydration Mismatch
   const { user } = useSelector((state: any) => state.auth);
   const { data } = useSession();
   const [socialAuth, { isSuccess }] = useSocialAuthMutation();
   const [logout, setLogout] = useState(false);
   useLogoutQuery(undefined, { skip: !logout });
+
+  useEffect(() => {
+    setMounted(true); // Chỉ bật sau khi Client đã mount xong
+  }, []);
 
   useEffect(() => {
     if (!user && data) socialAuth({ email: data?.user?.email, name: data?.user?.name, avatar: data?.user?.image });
@@ -37,18 +42,17 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   }, []);
 
   return (
-    /* ĐÃ SỬA: Thay relative + fixed bằng sticky để Navbar tự đẩy nội dung xuống */
     <div className="w-full sticky top-0 z-[999] transition-all duration-300">
       <div className={`w-full transition-all duration-300 ${active ? "bg-white/90 dark:bg-[#0A0A0A]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 py-3" : "bg-white dark:bg-[#050505] py-5 border-b border-transparent"}`}>
         <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="text-2xl font-Josefin font-bold tracking-tighter text-black dark:text-white">EngGo<span className="text-blue-500">.</span></Link>
-          
+
           <div className="hidden md:flex items-center gap-8">
             <NavItems activeItem={activeItem} isMobile={false} />
             <div className="w-[1px] h-4 bg-black/10 dark:bg-white/10" />
             <div className="flex items-center gap-4">
               <ThemeSwitcher />
-              {user ? (
+              {mounted && user ? (
                 <Link href="/profile">
                   <img src={user.avatar?.url || "/assets/avatar.png"} alt="avatar" className="w-9 h-9 rounded-full object-cover border border-black/10 dark:border-white/10 hover:ring-2 ring-blue-500 transition-all"/>
                 </Link>
@@ -73,7 +77,7 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
             </div>
             <NavItems activeItem={activeItem} isMobile={true} />
             <div className="mt-8 border-t border-black/10 dark:border-white/10 pt-8">
-              {user ? (
+              {mounted && user ? (
                 <Link href="/profile" className="flex items-center gap-3">
                   <img src={user.avatar?.url || "/assets/avatar.png"} className="w-10 h-10 rounded-full"/>
                   <span className="font-semibold text-sm">{user.name}</span>

@@ -2,7 +2,7 @@ import { styles } from "@/app/styles/style";
 import CoursePlayer from "@/app/utils/CoursePlayer";
 import Ratings from "@/app/components/utils/Ratings";
 import Link from "next/link";
-import React, { FC, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import { format } from "timeago.js";
 import CourseContentList from "./CourseContentList";
@@ -13,17 +13,21 @@ import toast from "react-hot-toast";
 interface Props { data: any; setRoute: any; setOpen: any; }
 
 const CourseDetails: FC<Props> = ({ data, setRoute, setOpen: openAuthModal }) => {
+  const [mounted, setMounted] = useState(false);
   const { data: userData } = useLoadUserQuery(undefined, {});
   const user = userData?.user; 
 
   const [createMoMoPayment, { data: paymentData, isSuccess, error, isLoading }] = useCreateMoMoPaymentMutation();
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (isSuccess && paymentData?.payUrl) window.location.href = paymentData.payUrl;
     if (error && "data" in error) toast.error((error as any).data.message);
   }, [isSuccess, error, paymentData]);
 
-  // Khai báo và tính toán % giảm giá chính xác
   const discountPercentage = data?.estimatedPrice
     ? ((data.estimatedPrice - data.price) / data.estimatedPrice) * 100
     : 0;
@@ -39,9 +43,7 @@ const CourseDetails: FC<Props> = ({ data, setRoute, setOpen: openAuthModal }) =>
   return (
     <div className="bg-[#FAFAFA] dark:bg-[#050505] min-h-screen pb-20 pt-10 px-4 md:px-8">
       <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Left Col - Content */}
         <div className="lg:col-span-2 space-y-12">
-          
           <div className="space-y-4">
             <div className="flex gap-2 mb-4">
                <span className="text-xs font-bold tracking-widest uppercase bg-black text-white dark:bg-white dark:text-black px-2 py-1 rounded">{data?.categories}</span>
@@ -112,7 +114,6 @@ const CourseDetails: FC<Props> = ({ data, setRoute, setOpen: openAuthModal }) =>
           </div>
         </div>
 
-        {/* Right Col - Floating Card */}
         <div className="lg:col-span-1">
           <div className="sticky top-24 bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-2xl overflow-hidden shadow-2xl p-6">
             <div className="aspect-video bg-neutral-900 rounded-lg overflow-hidden mb-6 border border-white/10">
@@ -134,7 +135,7 @@ const CourseDetails: FC<Props> = ({ data, setRoute, setOpen: openAuthModal }) =>
               )}
             </div>
             
-            {isPurchased ? (
+            {mounted && isPurchased ? (
               <Link href={`/course-access/${data?._id}`} className={`${styles.button} !w-full !rounded-xl !py-4`}>
                 Vào không gian học tập
               </Link>
