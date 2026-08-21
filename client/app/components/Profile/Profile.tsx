@@ -6,6 +6,8 @@ import ProfileInfo from "./ProfileInfo";
 import ChangePassword from "./ChangePassword";
 import CourseCard from "../Course/CourseCard";
 import { useGetUsersAllCoursesQuery } from "@/redux/features/courses/coursesApi";
+import { useDispatch } from "react-redux"; // <--- Import useDispatch
+import { userLoggedOut } from "@/redux/features/auth/authSlice"; // <--- Import userLoggedOut
 
 type Props = { user: any; };
 
@@ -14,18 +16,29 @@ const Profile: FC<Props> = ({ user }) => {
   const [courses, setCourses] = useState<any[]>([]);
   const { data } = useGetUsersAllCoursesQuery(undefined, {});
   
-  // FIX LỖI LOGOUT: Dùng fetch gọi thẳng xuống server để vượt mặt Cache của RTK Query
+  // Khởi tạo dispatch để dùng Redux
+  const dispatch = useDispatch();
+
+  // FIX LỖI LOGOUT: Dùng fetch gọi thẳng xuống server + chống Cache Vercel
   const logOutHandler = async () => { 
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SERVER_URI}/logout`, {
         method: 'GET',
-        credentials: 'include' // Bắt buộc để server nhận diện và xóa Cookie
+        credentials: 'include', // Bắt buộc để server nhận diện và xóa Cookie
+        cache: 'no-store' // Ép Vercel không được cache request này
       });
+      
+      // Xóa state user trong Redux
+      dispatch(userLoggedOut()); 
+      
+      // Xóa session của NextAuth mà không tự động redirect ngay
+      await signOut({ redirect: false }); 
+      
+      // Ép tải lại trang chủ từ server (tránh cache của browser)
+      window.location.href = "/";
     } catch (error) {
       console.log("Lỗi xóa cookie backend:", error);
     }
-    // Xóa session của Google/Github và tự động đá về trang chủ
-    signOut({ callbackUrl: "/" });
   };
 
   useEffect(() => {
