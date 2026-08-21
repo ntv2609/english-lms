@@ -6,8 +6,9 @@ import ProfileInfo from "./ProfileInfo";
 import ChangePassword from "./ChangePassword";
 import CourseCard from "../Course/CourseCard";
 import { useGetUsersAllCoursesQuery } from "@/redux/features/courses/coursesApi";
-import { useDispatch } from "react-redux"; // <--- Import useDispatch
-import { userLoggedOut } from "@/redux/features/auth/authSlice"; // <--- Import userLoggedOut
+import { useDispatch } from "react-redux";
+import { userLoggedOut } from "@/redux/features/auth/authSlice";
+import { apiSlice } from "@/redux/features/api/apiSlice"; // Thêm dòng này để xóa tận gốc cache RTK Query
 
 type Props = { user: any; };
 
@@ -15,27 +16,27 @@ const Profile: FC<Props> = ({ user }) => {
   const [active, setActive] = useState(1);
   const [courses, setCourses] = useState<any[]>([]);
   const { data } = useGetUsersAllCoursesQuery(undefined, {});
-  
-  // Khởi tạo dispatch để dùng Redux
   const dispatch = useDispatch();
 
-  // FIX LỖI LOGOUT: Dùng fetch gọi thẳng xuống server + chống Cache Vercel
   const logOutHandler = async () => { 
     try {
       await fetch(`${process.env.NEXT_PUBLIC_SERVER_URI}/logout`, {
-        method: 'GET',
-        credentials: 'include', // Bắt buộc để server nhận diện và xóa Cookie
-        cache: 'no-store' // Ép Vercel không được cache request này
+        method: 'POST', 
+        credentials: 'include',
+        cache: 'no-store'
       });
       
-      // Xóa state user trong Redux
+      // BƯỚC 1: Hủy diệt user state trong Redux
       dispatch(userLoggedOut()); 
       
-      // Xóa session của NextAuth mà không tự động redirect ngay
+      // BƯỚC 2: Hủy diệt TOÀN BỘ cache rác của RTK Query (loadUser, fetchCourses...)
+      dispatch(apiSlice.util.resetApiState());
+      
+      // BƯỚC 3: Dọn session mạng xã hội
       await signOut({ redirect: false }); 
       
-      // Ép tải lại trang chủ từ server (tránh cache của browser)
-      window.location.href = "/";
+      // BƯỚC 4: Dùng replace để văng trang, người dùng ấn nút Back không thể quay lại trang profile cũ được nữa
+      window.location.replace("/"); 
     } catch (error) {
       console.log("Lỗi xóa cookie backend:", error);
     }

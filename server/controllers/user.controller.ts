@@ -177,26 +177,39 @@ export const loginUser = CatchAsyncErrors(
 export const logoutUser = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const refresh_token = req.cookies.refresh_token as string;
+      const access_token = req.cookies.access_token as string;
+      let userId = "";
+
+      // FIX LỖI TẬN GỐC: Dùng jwt.decode thay vì jwt.verify.
+      // Dù token có hết hạn (expired), jwt.decode vẫn móc được ID ra để tiêu diệt session trong Redis!
+      if (refresh_token) {
+        const decoded = jwt.decode(refresh_token) as JwtPayload;
+        if (decoded && decoded.id) {
+          userId = decoded.id;
+        }
+      } else if (access_token) {
+        const decoded = jwt.decode(access_token) as JwtPayload;
+        if (decoded && decoded.id) {
+          userId = decoded.id;
+        }
+      }
+
       const isProduction = process.env.NODE_ENV === "production";
       
-      // FIX LỖI COOKIE KHÔNG XÓA: Phải truyền đúng cờ bảo mật thì trình duyệt mới chịu hủy Cookie
-      res.cookie("access_token", "", { 
-        maxAge: 1, 
-        httpOnly: true, 
-        sameSite: isProduction ? "none" : "lax", 
-        secure: isProduction 
-      });
-      res.cookie("refresh_token", "", { 
-        maxAge: 1, 
-        httpOnly: true, 
-        sameSite: isProduction ? "none" : "lax", 
-        secure: isProduction 
-      });
-      
-      const userId = req.user?._id || "";
+      const cookieOptions: any = {
+        expires: new Date(0), // Ép trình duyệt xóa cookie ngay lập tức
+        httpOnly: true,
+        sameSite: isProduction ? "none" : "lax",
+        secure: isProduction,
+      };
 
-      // Dùng await để đảm bảo Redis xóa session dứt điểm
-      await redis.del(userId.toString());
+      res.cookie("access_token", "", cookieOptions);
+      res.cookie("refresh_token", "", cookieOptions);
+
+      if (userId) {
+        await redis.del(userId.toString());
+      }
 
       res.status(200).json({
         success: true,
@@ -207,6 +220,7 @@ export const logoutUser = CatchAsyncErrors(
     }
   },
 );
+
 // update access token
 export const updateAccessToken = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -258,8 +272,6 @@ export const updateAccessToken = CatchAsyncErrors(
           accessToken,
         });
       } else {
-        // FIX BUG EXPIRED Ở ĐÂY LÀ HẾT NHỨC ĐẦU:
-        // Ép cập nhật lại req.cookies để thằng middleware isAuthenticated chạy ngay phía sau có token mới để kiểm tra
         req.cookies.access_token = accessToken;
         next();
       }
@@ -305,7 +317,6 @@ export const socialAuth = CatchAsyncErrors(
   },
 );
 
-// update user info (Đã refactor theo tutorial - loại bỏ email)
 interface IUpdateUserInfo {
   name?: string;
 }
@@ -399,9 +410,7 @@ export const updateProfilePicture = CatchAsyncErrors(async(req:Request,res:Respo
         const user = await userModel.findById(userId);
 
         if(avatar && user){
-            // if user have one avatar then call this if
             if(user?.avatar?.public_id){
-                // first delete the old image
                 await cloudinary.v2.uploader.destroy(user?.avatar?.public_id);
 
                 const myCloud = await cloudinary.v2.uploader.upload(avatar, {
