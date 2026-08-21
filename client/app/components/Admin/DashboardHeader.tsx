@@ -6,7 +6,8 @@ import { useGetNotificationsQuery, useUpdateNotificationStatusMutation } from "@
 import socketIO from "socket.io-client";
 import { format } from "timeago.js";
 
-const ENDPOINT = process.env.NEXT_PUBLIC_SERVER_URI || "";
+// FIX LỖI WEB CHẬM: Trỏ đúng vào SOCKET_SERVER_URI
+const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 interface Props {

@@ -4,6 +4,7 @@ import Protected from '../hooks/useProtected';
 import { Heading } from '../utils/Heading';
 import Header from '../components/Header';
 import Profile from '../components/Profile/Profile';
+import Footer from '../components/Footer';
 import { useSelector } from 'react-redux';
 
 const Page = () => {
@@ -13,7 +14,7 @@ const Page = () => {
   const { user } = useSelector((state: any) => state.auth);
 
   return (
-    <div>
+    <div className="min-h-screen">
       <Protected>
         <Heading
           title={`${user?.name} profile - eLearning`}
@@ -22,6 +23,7 @@ const Page = () => {
         />
         <Header open={open} setOpen={setOpen} activeItem={activeItem} setRoute={setRoute} route={route} />
         <Profile user={user} />
+        <Footer />
       </Protected>
     </div>
   );

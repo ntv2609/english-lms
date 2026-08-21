@@ -31,7 +31,7 @@ const CoursePlayer: FC<Props> = ({ videoUrl, title }) => {
     <div style={{ paddingTop: "56.25%", position: "relative" }}>
       {videoData.otp && videoData.playbackInfo !== "" && (
         <iframe
-          src={`https://player.vdocipher.com/v2/?otp=${videoData.otp}&playbackInfo=${videoData.playbackInfo}&player=Lp1aT4kQ`} // Sử dụng player ID giả định như tutorial, bạn có thể custom
+          src={`https://player.vdocipher.com/v2/?otp=${videoData.otp}&playbackInfo=${videoData.playbackInfo}&player=6NcX0xQP8FpoaPwp`} // Sử dụng player ID giả định như tutorial, bạn có thể custom
           style={{
             border: 0,
             width: "100%",

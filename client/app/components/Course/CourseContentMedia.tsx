@@ -19,10 +19,10 @@ import {
 import { BiMessage } from "react-icons/bi";
 import { VscVerifiedFilled } from "react-icons/vsc";
 import { format } from "timeago.js";
-import Ratings from "../utils/Ratings";
 import socketIO from "socket.io-client";
 
-const ENDPOINT = process.env.NEXT_PUBLIC_SERVER_URI || "";
+// TRỎ ĐÚNG SOCKET URI
+const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 type Props = {
@@ -68,8 +68,8 @@ const CourseContentMedia = ({
     } else {
       addNewQuestion({
         question,
-        courseId: id,
-        contentId: data[activeVideo]._id,
+        courseId: id.toString(),
+        contentId: data[activeVideo]._id.toString(),
       });
     }
   };
@@ -143,9 +143,9 @@ const CourseContentMedia = ({
   const handleAnswerSubmit = () => {
     addAnswerInQuestion({
       answer,
-      courseId: id,
-      contentId: data[activeVideo]._id,
-      questionId: questionId,
+      courseId: id.toString(),
+      contentId: data[activeVideo]._id.toString(),
+      questionId: questionId.toString(),
     });
   };
 
@@ -153,7 +153,7 @@ const CourseContentMedia = ({
     if (review.length === 0) {
       toast.error("Đánh giá không được để trống");
     } else {
-      addReviewInCourse({ review, rating, courseId: id });
+      addReviewInCourse({ review, rating, courseId: id.toString() });
     }
   };
 
@@ -161,7 +161,7 @@ const CourseContentMedia = ({
     if (!reply) {
       toast.error("Câu trả lời không được để trống");
     } else {
-      addReplyInReview({ comment: reply, courseId: id, reviewId });
+      addReplyInReview({ comment: reply, courseId: id.toString(), reviewId: reviewId.toString() });
     }
   };
 
@@ -391,16 +391,17 @@ const CourseContentMedia = ({
                         </small>
                       </div>
                     </div>
-                    {user.role === "admin" && (
+                    {/* CHỈ CHO PHÉP ADMIN REPLY NẾU ĐÁNH GIÁ ĐÓ CHƯA CÓ AI TRẢ LỜI */}
+                    {user.role === "admin" && item.commentReplies?.length === 0 && (
                       <div className="w-full flex items-center pl-14 mt-2">
                         <span
                           className={`${styles.label} cursor-pointer mr-2`}
                           onClick={() => {
-                            setIsReviewReply(true);
-                            setReviewId(item._id);
+                            setIsReviewReply(isReviewReply && reviewId === item._id ? false : true);
+                            setReviewId(isReviewReply && reviewId === item._id ? "" : item._id?.toString());
                           }}
                         >
-                          Trả lời
+                          {isReviewReply && reviewId === item._id ? "Hủy" : "Trả lời"}
                         </span>
                       </div>
                     )}
@@ -513,7 +514,9 @@ const CommentItem = ({
   handleAnswerSubmit,
   answerCreationLoading,
 }: any) => {
-  const [replyActive, setReplyActive] = useState(false);
+  // Lấy ra trạng thái reply độc lập từ questionId để chống bug accordion toggle lộn xộn
+  const isReplyActive = questionId === item._id;
+
   return (
     <div className="my-4">
       <div className="flex mb-2">
@@ -547,25 +550,25 @@ const CommentItem = ({
         <span
           className="text-[14px] cursor-pointer mr-2"
           onClick={() => {
-            setReplyActive(!replyActive);
-            setQuestionId(item._id);
+            // Nếu đang mở cái này thì setID rỗng để đóng, nếu chưa thì set ID của item này
+            setQuestionId(isReplyActive ? "" : item._id?.toString());
           }}
         >
-          {!replyActive
-            ? item.commentReplies.length !== 0
+          {!isReplyActive
+            ? item.commentReplies?.length !== 0
               ? "Tất cả phản hồi"
               : "Thêm phản hồi"
             : "Ẩn phản hồi"}
         </span>
         <BiMessage size={20} className="cursor-pointer" />
         <span className="pl-1 cursor-pointer">
-          {item.commentReplies.length}
+          {item.commentReplies?.length || 0}
         </span>
       </div>
 
-      {replyActive && questionId === item._id && (
+      {isReplyActive && (
         <>
-          {item.commentReplies.map((reply: any, i: number) => (
+          {item.commentReplies?.map((reply: any, i: number) => (
             <div className="w-full flex 800px:ml-16 my-5" key={i}>
               <div>
                 <Image

@@ -11,7 +11,7 @@ const Page = () => {
   const [route, setRoute] = useState("Login");
 
   return (
-    <div>
+    <div className="min-h-screen">
       <Heading
         title="Về chúng tôi - ELearning"
         description="ELearning là nền tảng học tập lập trình chất lượng cao."

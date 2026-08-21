@@ -7,12 +7,14 @@ export const ordersApi = apiSlice.injectEndpoints({
         url: "create-order",
         method: "POST",
         body: orderInfo,
+        credentials: "include", 
       }),
     }),
     getAllOrders: builder.query({
       query: () => ({
         url: "get-orders",
         method: "GET",
+        credentials: "include", // <--- Thêm dòng này để Admin lấy được bảng Invoices
       }),
     }),
     createMoMoPayment: builder.mutation({
@@ -20,6 +22,7 @@ export const ordersApi = apiSlice.injectEndpoints({
         url: "payment/momo",
         method: "POST",
         body: paymentInfo,
+        credentials: "include",
       }),
     }),
   }),

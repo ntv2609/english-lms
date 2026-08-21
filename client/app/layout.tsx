@@ -10,7 +10,8 @@ import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import Loader from "./components/Loader/Loader";
 import socketIO from "socket.io-client";
 
-const ENDPOINT = process.env.NEXT_PUBLIC_SERVER_URI || "";
+// FIX LỖI WEB CHẬM: Trỏ đúng vào SOCKET_SERVER_URI để không bị Rate Limit block
+const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 const poppins = Poppins({

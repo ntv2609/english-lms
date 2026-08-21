@@ -11,7 +11,7 @@ const Page = () => {
   const [route, setRoute] = useState("Login");
 
   return (
-    <div>
+    <div className="min-h-screen">
       <Heading
         title="Chính sách bảo mật - ELearning"
         description="Chính sách bảo mật và điều khoản sử dụng của ELearning."
