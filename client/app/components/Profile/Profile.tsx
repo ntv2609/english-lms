@@ -1,7 +1,6 @@
 "use client";
 import React, { FC, useState, useEffect } from "react";
 import SideBarProfile from "./SideBarProfile";
-import { useLogoutQuery } from "@/redux/features/auth/authApi";
 import { signOut } from "next-auth/react";
 import ProfileInfo from "./ProfileInfo";
 import ChangePassword from "./ChangePassword";
@@ -12,23 +11,21 @@ type Props = { user: any; };
 
 const Profile: FC<Props> = ({ user }) => {
   const [active, setActive] = useState(1);
-  const [logout, setLogout] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
   const { data } = useGetUsersAllCoursesQuery(undefined, {});
   
-  // Hook gọi API xóa Cookie từ backend
-  const { isSuccess: logoutSuccess } = useLogoutQuery(undefined, { skip: !logout });
-
-  // FIX LỖI RACE CONDITION: Đợi Backend báo thành công thì mới đá về trang chủ
-  useEffect(() => {
-    if (logoutSuccess) {
-      signOut({ callbackUrl: "/" });
+  // FIX LỖI LOGOUT: Dùng fetch gọi thẳng xuống server để vượt mặt Cache của RTK Query
+  const logOutHandler = async () => { 
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_SERVER_URI}/logout`, {
+        method: 'GET',
+        credentials: 'include' // Bắt buộc để server nhận diện và xóa Cookie
+      });
+    } catch (error) {
+      console.log("Lỗi xóa cookie backend:", error);
     }
-  }, [logoutSuccess]);
-
-  const logOutHandler = () => { 
-    // Kích hoạt biến logout để RTK Query gọi API xuống server
-    setLogout(true); 
+    // Xóa session của Google/Github và tự động đá về trang chủ
+    signOut({ callbackUrl: "/" });
   };
 
   useEffect(() => {
