@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AiFillStar, AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineStar } from "react-icons/ai";
 import { format } from "timeago.js";
-import AIChatbot from "../AI/AIChatbot"; // <--- Thêm import Chatbot
-import AIWriting from "../AI/AIWriting"; // <--- Thêm import Writing
+import AIChatbot from "../AI/AIChatbot"; 
+import AIWriting from "../AI/AIWriting"; 
 
 type Props = { data: any; id: string; activeVideo: number; setActiveVideo: (activeVideo: number) => void; user: any; refetch: any; };
 
@@ -36,12 +36,10 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
     if (rrSuccess) { setReply(""); setReviewId(""); courseRefetch(); toast.success("Phản hồi đánh giá thành công"); }
   }, [qSuccess, aSuccess, rSuccess, rrSuccess, refetch, courseRefetch]);
 
-  // FIX: Thêm Tab Luyện Viết AI
   const tabs = ["Tổng quan", "Tài nguyên", "Hỏi đáp", "Đánh giá", "Luyện Viết AI"];
 
   return (
     <div className="w-full relative">
-      {/* Premium Video Player Container */}
       <div className="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/10 mb-6">
         <CoursePlayer title={data[activeVideo]?.title} videoUrl={data[activeVideo]?.videoUrl} />
       </div>
@@ -53,7 +51,6 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
 
       <h1 className="text-2xl md:text-3xl font-Josefin font-bold text-black dark:text-white mb-6">{data[activeVideo].title}</h1>
 
-      {/* Modern Tabs */}
       <div className="flex border-b border-black/10 dark:border-white/10 mb-8 overflow-x-auto hide-scrollbar">
         {tabs.map((t, i) => (
           <button key={i} onClick={() => setActiveBar(i)} className={`px-6 py-4 text-sm font-medium tracking-wide transition-all whitespace-nowrap relative ${activeBar === i ? "text-blue-600 dark:text-blue-400" : "text-neutral-500 hover:text-black dark:hover:text-white"}`}>
@@ -63,7 +60,6 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
         ))}
       </div>
 
-      {/* Tab Content Areas */}
       <div className="min-h-[300px]">
         {activeBar === 0 && (
           <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed font-light whitespace-pre-line">{data[activeVideo]?.description}</p>
@@ -198,11 +194,13 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
 
         {/* Tab Writing AI */}
         {activeBar === 4 && (
-          <AIWriting topic={data[activeVideo].title} />
+          <AIWriting 
+            topic={data[activeVideo].title} 
+            homework={data[activeVideo].homework} // Truyền nội dung bài tập sang cho AIWriting
+          />
         )}
       </div>
       
-      {/* Chatbot AI Global Widget */}
       <AIChatbot context={`Tên bài giảng: ${data[activeVideo].title}. Mô tả: ${data[activeVideo].description}`} />
     </div>
   );

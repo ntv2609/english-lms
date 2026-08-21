@@ -26,7 +26,8 @@ const EditCourse: FC<Props> = ({ id }) => {
   const [courseInfo, setCourseInfo] = useState({ name: "", description: "", categories: "", price: "", estimatedPrice: "", tags: "", level: "", demoUrl: "", thumbnail: "" });
   const [benefits, setBenefits] = useState([{ title: "" }]);
   const [prerequisites, setPrerequisites] = useState([{ title: "" }]);
-  const [courseContentData, setCourseContentData] = useState([{ videoUrl: "", title: "", description: "", videoLength: "", videoSection: "Untitled Section", links: [{ title: "", url: "" }], suggestion: "" }]);
+  // Bổ sung thuộc tính homework: "" vào initial state
+  const [courseContentData, setCourseContentData] = useState([{ videoUrl: "", title: "", description: "", videoLength: "", videoSection: "Untitled Section", homework: "", links: [{ title: "", url: "" }], suggestion: "" }]);
   const [courseData, setCourseData] = useState({});
 
   useEffect(() => {

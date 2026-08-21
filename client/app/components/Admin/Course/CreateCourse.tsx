@@ -24,7 +24,8 @@ const CreateCourse: FC<Props> = (props) => {
   const [courseInfo, setCourseInfo] = useState({ name: "", description: "", price: "", estimatedPrice: "", tags: "", level: "", categories: "", demoUrl: "", thumbnail: "" });
   const [benefits, setBenefits] = useState([{ title: "" }]);
   const [prerequisites, setPrerequisites] = useState([{ title: "" }]);
-  const [courseContentData, setCourseContentData] = useState([{ videoUrl: "", title: "", description: "", videoLength: "", videoSection: "Phần 1: Giới thiệu", links: [{ title: "", url: "" }], suggestion: "" }]);
+  // Bổ sung thuộc tính homework: "" vào initial state
+  const [courseContentData, setCourseContentData] = useState([{ videoUrl: "", title: "", description: "", videoLength: "", videoSection: "Phần 1: Giới thiệu", homework: "", links: [{ title: "", url: "" }], suggestion: "" }]);
   const [courseData, setCourseData] = useState({});
 
   const handleSubmit = async () => {

@@ -1,8 +1,5 @@
-// BỔ SUNG TRƯỜNG CATEGORIES VÀ TIMESTAMPS
-
 import mongoose, { Document, Model, Schema } from "mongoose";
 
-// ... (giữ nguyên các interface IComment, IReview, ILink, ICourseData) ...
 interface IComment extends Document {
   user: object;
   comment: string;
@@ -32,12 +29,13 @@ interface ICourseData extends Document {
   links: ILink[];
   suggestion: string;
   questions: IComment[];
+  homework?: string; // BỔ SUNG TRƯỜNG BÀI TẬP VỀ NHÀ
 }
 
 interface ICourse extends Document {
   name: string;
   description: string;
-  categories: string; // FIX: Bổ sung categories
+  categories: string;
   price: number;
   estimatedPrice?: number;
   thumbnail: object;
@@ -84,6 +82,7 @@ const courseDataSchema = new Schema<ICourseData>({
   links: [linkSchema],
   suggestion: String,
   questions: [commentSchema],
+  homework: String, // BỔ SUNG VÀO SCHEMA
 });
 
 const courseSchema = new Schema<ICourse>({
@@ -95,7 +94,7 @@ const courseSchema = new Schema<ICourse>({
     type: String,
     required: true,
   },
-  categories: { // FIX: Bổ sung categories để lọc ngoài trang chủ
+  categories: { 
     type: String,
     required: true,
   },
@@ -140,7 +139,7 @@ const courseSchema = new Schema<ICourse>({
     type: Number,
     default: 0,
   },
-}, { timestamps: true }); // FIX CHÍNH: Bổ sung timestamps để Mongoose tự sinh createdAt
+}, { timestamps: true });
 
 const CourseModel: Model<ICourse> = mongoose.model<ICourse>("Course", courseSchema);
 

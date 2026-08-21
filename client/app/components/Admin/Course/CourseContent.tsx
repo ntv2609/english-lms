@@ -4,7 +4,7 @@ import { AiOutlineDelete, AiOutlinePlusCircle } from "react-icons/ai";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { BsPencil, BsLink45Deg } from "react-icons/bs";
 import toast from "react-hot-toast";
-import { useGenerateQuizMutation } from "@/redux/features/courses/coursesApi"; // <-- Load API Sinh Quiz AI
+import { useGenerateQuizMutation } from "@/redux/features/courses/coursesApi"; 
 
 interface Props {
   active: number;
@@ -18,7 +18,6 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
   const [isCollapsed, setIsCollapsed] = useState(Array(courseContentData.length).fill(false));
   const [activeSection, setActiveSection] = useState<number>(1);
   
-  // Trạng thái AI Loading
   const [generateQuiz, { isLoading: isGeneratingQuiz }] = useGenerateQuizMutation();
 
   const toggle = (idx: number) => {
@@ -33,7 +32,7 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
     } else {
       let sec = "";
       if (courseContentData.length > 0) sec = courseContentData[courseContentData.length - 1].videoSection;
-      setCourseContentData([...courseContentData, { videoUrl: "", title: "", description: "", videoLength: "", videoSection: sec, links: [{ title: "", url: "" }] }]);
+      setCourseContentData([...courseContentData, { videoUrl: "", title: "", description: "", videoLength: "", videoSection: sec, homework: "", links: [{ title: "", url: "" }] }]);
     }
   };
 
@@ -43,11 +42,10 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
       toast.error("Please fill required fields first!");
     } else {
       setActiveSection(activeSection + 1);
-      setCourseContentData([...courseContentData, { videoUrl: "", title: "", description: "", videoLength: "", videoSection: `Untitled Section ${activeSection}`, links: [{ title: "", url: "" }] }]);
+      setCourseContentData([...courseContentData, { videoUrl: "", title: "", description: "", videoLength: "", videoSection: `Untitled Section ${activeSection}`, homework: "", links: [{ title: "", url: "" }] }]);
     }
   };
 
-  // Hàm sinh Quiz bằng AI và nối thẳng vào Description
   const handleGenerateAIQuiz = async (index: number) => {
     const currentLesson = courseContentData[index];
     if (!currentLesson.title && !currentLesson.description) {
@@ -139,7 +137,6 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                   <div>
                     <div className="flex items-center justify-between">
                       <label className={styles.label}>Description</label>
-                      {/* Nút Sinh Trắc Nghiệm Bằng AI */}
                       <button 
                         type="button" 
                         onClick={() => handleGenerateAIQuiz(index)}
@@ -150,6 +147,18 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                       </button>
                     </div>
                     <textarea rows={6} className={styles.input + " !h-auto py-3 resize-none"} value={item.description} onChange={(e) => { const arr=[...courseContentData]; arr[index].description=e.target.value; setCourseContentData(arr); }} />
+                  </div>
+
+                  {/* BỔ SUNG Ô NHẬP BÀI TẬP WRITING CHO TỪNG VIDEO */}
+                  <div className="pt-2">
+                    <label className={styles.label}>Bài tập Writing / Đề bài (Tùy chọn)</label>
+                    <textarea 
+                      rows={3} 
+                      placeholder="Nhập đề bài Writing (Homework) cho học viên tại đây. AI sẽ dùng đề này để chấm điểm..." 
+                      className={styles.input + " !h-auto py-3 resize-none bg-blue-500/5 border-blue-500/20"} 
+                      value={item.homework || ""} 
+                      onChange={(e) => { const arr=[...courseContentData]; arr[index].homework=e.target.value; setCourseContentData(arr); }} 
+                    />
                   </div>
                   
                   <div className="pt-4 space-y-4">

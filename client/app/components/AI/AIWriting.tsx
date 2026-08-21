@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { styles } from "@/app/styles/style";
 import { useEvaluateWritingMutation } from "@/redux/features/courses/coursesApi";
 import toast from "react-hot-toast";
-import { BiWinkSmile, BiSad, BiTrophy } from "react-icons/bi";
+import { BiWinkSmile, BiSad, BiTrophy, BiBookOpen } from "react-icons/bi";
 
 interface Props {
   topic: string;
+  homework?: string; // Nhận thêm đề bài tập về nhà
 }
 
-const AIWriting: React.FC<Props> = ({ topic }) => {
+const AIWriting: React.FC<Props> = ({ topic, homework }) => {
   const [content, setContent] = useState("");
   const [result, setResult] = useState<any>(null);
   
@@ -20,8 +21,11 @@ const AIWriting: React.FC<Props> = ({ topic }) => {
       return;
     }
     
+    // Nếu giáo viên có giao bài tập (homework), AI sẽ dùng nó làm đề. Nếu không, AI chấm theo title bài học (topic)
+    const topicToEvaluate = homework || topic;
+
     try {
-      const res = await evaluateWriting({ content, topic }).unwrap();
+      const res = await evaluateWriting({ content, topic: topicToEvaluate }).unwrap();
       setResult(res.evaluation);
       toast.success("AI đã chấm xong!");
     } catch (error: any) {
@@ -41,9 +45,21 @@ const AIWriting: React.FC<Props> = ({ topic }) => {
         </div>
       </div>
 
+      {/* Hiển thị box Đề bài cho học sinh đọc trước khi viết */}
+      {homework ? (
+        <div className="bg-neutral-100 dark:bg-neutral-800/50 p-5 rounded-xl mb-6 border-l-4 border-blue-500 shadow-sm">
+          <h4 className="flex items-center gap-2 font-bold text-sm uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">
+            <BiBookOpen size={18}/> Đề bài tập về nhà:
+          </h4>
+          <p className="text-black dark:text-white leading-relaxed text-sm whitespace-pre-line">{homework}</p>
+        </div>
+      ) : (
+        <p className="text-sm text-neutral-500 mb-6 italic">Bài học này chưa có đề bài cụ thể, bạn có thể tự do luyện viết theo chủ đề: <b>{topic}</b></p>
+      )}
+
       <div className="space-y-4">
         <div>
-          <label className={styles.label}>Nội dung bài viết (Tối thiểu 50 ký tự)</label>
+          <label className={styles.label}>Nội dung bài làm của bạn (Tối thiểu 50 ký tự)</label>
           <textarea
             className={`${styles.input} !h-48 py-4 resize-none border border-black/10 dark:border-white/10 rounded-lg p-4 bg-white dark:bg-[#0A0A0A]`}
             placeholder="Type your essay or paragraph here..."
@@ -62,7 +78,7 @@ const AIWriting: React.FC<Props> = ({ topic }) => {
           disabled={isLoading || content.length < 50} 
           className={`${styles.button} !w-full md:!w-48 !py-3 flex items-center justify-center gap-2`}
         >
-          {isLoading ? "Đang phân tích..." : "Chấm bài ngay"}
+          {isLoading ? "Đang phân tích..." : "Nộp bài cho AI chấm"}
         </button>
       </div>
 
