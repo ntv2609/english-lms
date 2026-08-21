@@ -10,7 +10,8 @@ interface Props { setRoute: (route: string) => void; }
 const Verification: FC<Props> = ({ setRoute }) => {
   const { token } = useSelector((state: any) => state.auth);
   const [activation, { isSuccess, error }] = useActivationMutation();
-  const [verifyNumber, setVerifyNumber] = useState({ 0: "", 1: "", 2: "", 3: "", 4: "", 5: "" });
+  // Đổi kiểu key sang string để không bị tranh chấp kiểu dữ liệu khắt khe
+  const [verifyNumber, setVerifyNumber] = useState<{ [key: string]: string }>({ 0: "", 1: "", 2: "", 3: "", 4: "", 5: "" });
   const inputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
   useEffect(() => {
@@ -38,7 +39,15 @@ const Verification: FC<Props> = ({ setRoute }) => {
       </div>
       <div className="flex justify-center gap-3 mb-8">
         {Object.keys(verifyNumber).map((k, i) => (
-          <input key={k} ref={inputRefs[i]} type="number" maxLength={1} value={verifyNumber[k as keyof typeof verifyNumber]} onChange={(e) => handleInputChange(i, e.target.value)} className="w-12 h-14 text-center text-xl font-mono font-bold bg-transparent border-2 border-black/10 dark:border-white/10 rounded-lg outline-none focus:border-blue-500 transition-colors text-black dark:text-white" />
+          <input 
+            key={k} 
+            ref={inputRefs[i]} 
+            type="number" 
+            maxLength={1} 
+            value={verifyNumber[k]} 
+            onChange={(e) => handleInputChange(i, e.target.value)} 
+            className="w-12 h-14 text-center text-xl font-mono font-bold bg-transparent border-2 border-black/10 dark:border-white/10 rounded-lg outline-none focus:border-blue-500 transition-colors text-black dark:text-white" 
+          />
         ))}
       </div>
       <button className={styles.button} onClick={verificationHandler}>Xác nhận OTP</button>
