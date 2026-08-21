@@ -16,12 +16,12 @@ const Policy = () => {
         
         <h3 className="font-bold text-[22px] mb-2">2. Điều khoản thanh toán</h3>
         <p className="mb-4">
-          Tất cả các giao dịch thanh toán trên nền tảng (ví dụ: MoMo) đều tuân thủ các quy định bảo mật hiện hành. Sau khi thanh toán thành công, khóa học sẽ tự động được mở khóa trên tài khoản của bạn.
+          Tất cả các giao dịch thanh toán trên nền tảng đều tuân thủ các quy định bảo mật hiện hành. Sau khi thanh toán thành công, khóa học sẽ tự động được mở khóa trên tài khoản của bạn.
         </p>
         
         <h3 className="font-bold text-[22px] mb-2">3. Quyền sở hữu trí tuệ</h3>
         <p className="mb-4">
-          Toàn bộ tài liệu, video bài giảng và mã nguồn đính kèm trên ELearning đều thuộc quyền sở hữu trí tuệ của nền tảng. Nghiêm cấm mọi hành vi phát tán, sao chép hoặc phân phối lại vì mục đích thương mại khi chưa có sự đồng ý.
+          Toàn bộ tài liệu, video bài giảng, giáo trình và file luyện nghe đính kèm trên EngGo đều thuộc quyền sở hữu trí tuệ của nền tảng. Nghiêm cấm mọi hành vi phát tán, sao chép hoặc phân phối lại vì mục đích thương mại khi chưa có sự đồng ý.
         </p>
       </div>
     </div>

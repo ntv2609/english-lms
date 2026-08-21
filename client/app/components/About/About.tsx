@@ -10,15 +10,15 @@ const About = () => {
       <br />
       <div className="w-full text-black dark:text-white font-Poppins text-[18px] leading-8">
         <p>
-          Chào mừng bạn đến với ELearning, nền tảng học tập trực tuyến hàng đầu dành cho cộng đồng lập trình viên. Sứ mệnh của chúng tôi là cung cấp các khóa học lập trình thực chiến, chất lượng cao, giúp bạn làm chủ công nghệ từ cơ bản đến nâng cao.
+          Chào mừng bạn đến với EngGo, nền tảng học tiếng Anh trực tuyến hàng đầu dành cho cộng đồng yêu ngôn ngữ. Sứ mệnh của chúng tôi là cung cấp các khóa học tiếng Anh thực chiến, chất lượng cao, giúp bạn làm chủ giao tiếp và ngoại ngữ từ cơ bản đến nâng cao.
         </p>
         <br />
         <p>
-          Với tầm nhìn trở thành trung tâm đào tạo lập trình uy tín, chúng tôi luôn cập nhật những công nghệ mới nhất như MERN Stack, Next.js, Redux, Machine Learning và nhiều hơn thế nữa. Hệ thống giảng dạy được thiết kế logic, dễ hiểu, kết hợp giữa lý thuyết và bài tập thực hành.
+          Với tầm nhìn trở thành trung tâm đào tạo tiếng Anh uy tín, chúng tôi luôn cập nhật những phương pháp học tiên tiến nhất như Phản xạ tự nhiên, IELTS chiến lược, Tiếng Anh Giao tiếp Công sở và nhiều hơn thế nữa. Hệ thống giảng dạy được thiết kế logic, dễ hiểu, kết hợp chặt chẽ giữa lý thuyết và thực hành tương tác.
         </p>
         <br />
         <p>
-          Hãy cùng chúng tôi xây dựng một tương lai nơi mà bất kỳ ai cũng có thể trở thành một kỹ sư phần mềm xuất sắc. Chúc bạn có những giờ phút học tập hiệu quả cùng ELearning!
+          Hãy cùng chúng tôi xây dựng một tương lai nơi mà bất kỳ ai cũng có thể tự tin sử dụng tiếng Anh thành thạo như tiếng mẹ đẻ. Chúc bạn có những giờ phút học tập hiệu quả cùng EngGo!
         </p>
       </div>
     </div>
