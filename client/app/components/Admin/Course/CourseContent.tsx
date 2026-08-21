@@ -4,6 +4,7 @@ import { AiOutlineDelete, AiOutlinePlusCircle } from "react-icons/ai";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { BsPencil, BsLink45Deg } from "react-icons/bs";
 import toast from "react-hot-toast";
+import { useGenerateQuizMutation } from "@/redux/features/courses/coursesApi"; // <-- Load API Sinh Quiz AI
 
 interface Props {
   active: number;
@@ -16,6 +17,9 @@ interface Props {
 const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, active, setActive, handleSubmit }) => {
   const [isCollapsed, setIsCollapsed] = useState(Array(courseContentData.length).fill(false));
   const [activeSection, setActiveSection] = useState<number>(1);
+  
+  // Trạng thái AI Loading
+  const [generateQuiz, { isLoading: isGeneratingQuiz }] = useGenerateQuizMutation();
 
   const toggle = (idx: number) => {
     const arr = [...isCollapsed];
@@ -40,6 +44,37 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
     } else {
       setActiveSection(activeSection + 1);
       setCourseContentData([...courseContentData, { videoUrl: "", title: "", description: "", videoLength: "", videoSection: `Untitled Section ${activeSection}`, links: [{ title: "", url: "" }] }]);
+    }
+  };
+
+  // Hàm sinh Quiz bằng AI và nối thẳng vào Description
+  const handleGenerateAIQuiz = async (index: number) => {
+    const currentLesson = courseContentData[index];
+    if (!currentLesson.title && !currentLesson.description) {
+      toast.error("Hãy nhập tiêu đề hoặc mô tả trước để AI có dữ liệu sinh đề nhé!");
+      return;
+    }
+
+    try {
+      const contextData = `${currentLesson.title} - ${currentLesson.description}`;
+      const res = await generateQuiz({ contextData, questionCount: 5, level: "Intermediate" }).unwrap();
+      
+      let quizText = `\n\n--- 🤖 BÀI TẬP TRẮC NGHIỆM (AI SINH TỰ ĐỘNG) ---\n`;
+      res.questions.forEach((q: any, i: number) => {
+        quizText += `\nCâu ${i + 1}: ${q.question}\n`;
+        q.options.forEach((opt: string, j: number) => {
+          quizText += `  ${String.fromCharCode(65 + j)}. ${opt}\n`;
+        });
+        quizText += `=> Đáp án: ${q.correctAnswer}\n`;
+        quizText += `* Giải thích: ${q.explanation}\n`;
+      });
+
+      const arr = [...courseContentData];
+      arr[index].description = (arr[index].description || "") + quizText;
+      setCourseContentData(arr);
+      toast.success("AI đã tạo xong 5 câu hỏi trắc nghiệm!");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Lỗi AI, vui lòng thử lại!");
     }
   };
 
@@ -102,8 +137,19 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                     <input type="number" className={styles.input} value={item.videoLength} onChange={(e) => { const arr=[...courseContentData]; arr[index].videoLength=e.target.value; setCourseContentData(arr); }} />
                   </div>
                   <div>
-                    <label className={styles.label}>Description</label>
-                    <textarea rows={4} className={styles.input + " !h-auto py-3 resize-none"} value={item.description} onChange={(e) => { const arr=[...courseContentData]; arr[index].description=e.target.value; setCourseContentData(arr); }} />
+                    <div className="flex items-center justify-between">
+                      <label className={styles.label}>Description</label>
+                      {/* Nút Sinh Trắc Nghiệm Bằng AI */}
+                      <button 
+                        type="button" 
+                        onClick={() => handleGenerateAIQuiz(index)}
+                        disabled={isGeneratingQuiz}
+                        className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full hover:bg-emerald-500/20 transition-colors flex items-center gap-1 mb-1 disabled:opacity-50"
+                      >
+                        🪄 {isGeneratingQuiz ? "Đang sinh đề..." : "Trợ lý AI: Sinh trắc nghiệm"}
+                      </button>
+                    </div>
+                    <textarea rows={6} className={styles.input + " !h-auto py-3 resize-none"} value={item.description} onChange={(e) => { const arr=[...courseContentData]; arr[index].description=e.target.value; setCourseContentData(arr); }} />
                   </div>
                   
                   <div className="pt-4 space-y-4">

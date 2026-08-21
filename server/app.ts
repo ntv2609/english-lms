@@ -10,6 +10,7 @@ import orderRouter from "./routes/order.route";
 import notificationRouter from "./routes/notification.route";
 import analyticsRouter from "./routes/analytics.route";
 import layoutRouter from "./routes/layout.route";
+import aiRouter from "./routes/ai.route";
 import { rateLimit } from 'express-rate-limit';
 
 //body parser
@@ -41,6 +42,7 @@ app.use("/api/v1/", orderRouter);
 app.use("/api/v1/", notificationRouter); 
 app.use("/api/v1/", analyticsRouter); 
 app.use("/api/v1/", layoutRouter); 
+app.use("/api/v1/", aiRouter); // BỔ SUNG ROUTE AI TẠI ĐÂY
 
 //testing api
 app.get("/test", (req: Request, res: Response, next: NextFunction) => {

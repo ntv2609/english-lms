@@ -29,7 +29,6 @@ export const coursesApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
-    // Endpoint mới để fetch content bài giảng
     getCourseContent: builder.query({
       query: (id: string) => ({
         url: `get-course-content/${id}`,
@@ -37,7 +36,6 @@ export const coursesApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
-    // Mutation thêm câu hỏi
     addQuestion: builder.mutation({
       query: (data) => ({
         url: "add-question",
@@ -46,7 +44,6 @@ export const coursesApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
-    // Mutation trả lời câu hỏi
     addAnswerInQuestion: builder.mutation({
       query: (data) => ({
         url: "add-answer",
@@ -55,7 +52,6 @@ export const coursesApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
-    // Mutation đánh giá khoá học
     addReviewInCourse: builder.mutation({
       query: ({ review, rating, courseId }) => ({
         url: `add-review/${courseId}`,
@@ -64,7 +60,6 @@ export const coursesApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
-    // Mutation phản hồi đánh giá
     addReplyInReview: builder.mutation({
       query: (data) => ({
         url: "add-reply",
@@ -88,6 +83,33 @@ export const coursesApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+    // ==========================================
+    // CÁC ENDPOINT TÍCH HỢP AI MỚI
+    // ==========================================
+    chatWithAI: builder.mutation({
+      query: (data) => ({
+        url: "ai/chat",
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+    }),
+    evaluateWriting: builder.mutation({
+      query: (data) => ({
+        url: "ai/evaluate-writing",
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+    }),
+    generateQuiz: builder.mutation({
+      query: (data) => ({
+        url: "ai/generate-quiz",
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -102,5 +124,8 @@ export const {
   useAddReviewInCourseMutation,
   useAddReplyInReviewMutation,
   useDeleteCourseMutation, 
-  useEditCourseMutation 
+  useEditCourseMutation,
+  useChatWithAIMutation,
+  useEvaluateWritingMutation,
+  useGenerateQuizMutation
 } = coursesApi;
