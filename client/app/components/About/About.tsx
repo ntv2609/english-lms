@@ -3,22 +3,25 @@ import { styles } from "@/app/styles/style";
 
 const About = () => {
   return (
-    <div className="w-[90%] 800px:w-[80%] m-auto min-h-[70vh] py-12">
-      <h1 className={`${styles.title} 800px:text-[40px]`}>
-        Về <span className="text-gradient">Chúng tôi</span>
+    <div className="w-[90%] md:w-[70%] max-w-4xl m-auto min-h-[70vh] py-24 relative z-10">
+      <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/10 blur-[100px] rounded-full mix-blend-multiply pointer-events-none" />
+      <h1 className={`${styles.title} text-left md:text-[64px] mb-8 leading-tight`}>
+        Về <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-emerald-400">EngGo.</span>
       </h1>
-      <br />
-      <div className="w-full text-black dark:text-white font-Poppins text-[18px] leading-8">
+      <div className="w-full text-neutral-600 dark:text-neutral-400 font-Poppins text-[18px] md:text-[20px] leading-[1.8] space-y-8 font-light">
         <p>
-          Chào mừng bạn đến với EngGo, nền tảng học tiếng Anh trực tuyến hàng đầu dành cho cộng đồng yêu ngôn ngữ. Sứ mệnh của chúng tôi là cung cấp các khóa học tiếng Anh thực chiến, chất lượng cao, giúp bạn làm chủ giao tiếp và ngoại ngữ từ cơ bản đến nâng cao.
+          Chào mừng bạn đến với EngGo, nền tảng học tiếng Anh trực tuyến được thiết kế với tiêu chuẩn khắt khe nhất. Sứ mệnh của chúng tôi là phá vỡ lối mòn giáo dục truyền thống, mang đến trải nghiệm học tập thực chiến, sắc bén và đậm chất công nghệ.
         </p>
-        <br />
+        <div className="pl-6 border-l-2 border-black dark:border-white py-2">
+          <p className="text-black dark:text-white font-medium italic">
+            "Không chỉ là ngôn ngữ, chúng tôi trao cho bạn chiếc chìa khóa để hội nhập toàn cầu."
+          </p>
+        </div>
         <p>
-          Với tầm nhìn trở thành trung tâm đào tạo tiếng Anh uy tín, chúng tôi luôn cập nhật những phương pháp học tiên tiến nhất như Phản xạ tự nhiên, IELTS chiến lược, Tiếng Anh Giao tiếp Công sở và nhiều hơn thế nữa. Hệ thống giảng dạy được thiết kế logic, dễ hiểu, kết hợp chặt chẽ giữa lý thuyết và thực hành tương tác.
+          Hệ thống giảng dạy của EngGo được xây dựng dựa trên sự tối giản: Loại bỏ lý thuyết rườm rà, tập trung 100% vào phản xạ tự nhiên, IELTS chiến lược và Tiếng Anh Giao tiếp Công sở. Giao diện bạn đang trải nghiệm được thiết kế riêng biệt để triệt tiêu mọi sự xao nhãng, giúp tâm trí bạn hoàn toàn tĩnh lặng để tiếp thu kiến thức.
         </p>
-        <br />
         <p>
-          Hãy cùng chúng tôi xây dựng một tương lai nơi mà bất kỳ ai cũng có thể tự tin sử dụng tiếng Anh thành thạo như tiếng mẹ đẻ. Chúc bạn có những giờ phút học tập hiệu quả cùng EngGo!
+          Tương lai thuộc về những người dám hành động. Bắt đầu hành trình tinh gọn hóa ngôn ngữ cùng EngGo ngay hôm nay.
         </p>
       </div>
     </div>

@@ -2,50 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  body {
+    @apply bg-white text-black dark:bg-[#050505] dark:text-white antialiased transition-colors duration-300;
+  }
 }
 
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-black/20 dark:bg-white/20 rounded-full; }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { @apply bg-black/40 dark:bg-white/40; }
 }
 
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
-}
-
-.shake {
-  animation: shake 0.5s;
-}
-
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  50% { transform: translateX(10px); }
-  75% { transform: translateX(-10px); }
-  100% { transform: translateX(0); }
-}
-
-.hero_animation {
-  background-image: linear-gradient(
-    147.92deg,
-    hsla(239, 76%, 53%, 0.456) 10.41%,
-    hsla(0, 0%, 100%, 0) 89.25%
-  );
-  animation: changeBackgroundColor 8s infinite alternate;
-}
-
-@keyframes changeBackgroundColor {
-  0%, 100% { opacity: 1; }
-  16.67% { opacity: 0.9; }
-  33.33% { opacity: 0.8; }
-  50% { opacity: 0.6; }
-  66.67% { opacity: 0.5; }
-  83.33% { opacity: 0.4; }
-}
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }

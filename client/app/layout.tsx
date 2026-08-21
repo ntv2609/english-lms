@@ -10,37 +10,21 @@ import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import Loader from "./components/Loader/Loader";
 import socketIO from "socket.io-client";
 
-// FIX LỖI WEB CHẬM: Trỏ đúng vào SOCKET_SERVER_URI để không bị Rate Limit block
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-Poppins",
-});
+const poppins = Poppins({ subsets: ["latin"], weight: ["300", "400", "500", "600"], variable: "--font-Poppins" });
+const josefin = Josefin_Sans({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--font-Josefin" });
 
-const josefin = Josefin_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-Josefin",
-});
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body
-        className={`${poppins.variable} ${josefin.variable} !bg-white bg-no-repeat dark:bg-gradient-to-b dark:from-gray-900 dark:to-black duration-300`}
-      >
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${poppins.variable} ${josefin.variable} font-Poppins`}>
         <Providers>
           <SessionProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <Custom>{children}</Custom>
-              <Toaster position="top-center" reverseOrder={false} />
+              <Toaster position="top-center" toastOptions={{ className: 'dark:bg-[#111] dark:text-white dark:border dark:border-white/10 rounded-lg font-Poppins text-sm shadow-xl' }} />
             </ThemeProvider>
           </SessionProvider>
         </Providers>
@@ -51,10 +35,6 @@ export default function RootLayout({
 
 const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading } = useLoadUserQuery(undefined, {});
-
-  useEffect(() => {
-    socketId.on("connection", () => {});
-  }, []);
-
+  useEffect(() => { socketId.on("connection", () => {}); }, []);
   return <>{isLoading ? <Loader /> : <>{children}</>}</>;
 };

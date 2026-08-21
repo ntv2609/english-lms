@@ -11,10 +11,9 @@ interface Props {
 
 const OrderAnalytics: FC<Props> = ({ isDashboard }) => {
   const { data, isLoading } = useGetOrdersAnalyticsQuery({});
-
   const analyticsData: any = [];
 
-  if (data && data.orders && data.orders.last12Months) {
+  if (data?.orders?.last12Months) {
     data.orders.last12Months.forEach((item: any) => {
       analyticsData.push({ name: item.month, count: item.count });
     });
@@ -25,46 +24,22 @@ const OrderAnalytics: FC<Props> = ({ isDashboard }) => {
       {isLoading ? (
         <Loader />
       ) : (
-        <div className={isDashboard ? "h-[30vh]" : "h-screen"}>
-          <div className={isDashboard ? "mt-[0px] pl-[40px] mb-2" : "mt-[50px]"}>
-            <h1
-              className={`${styles.title} ${
-                isDashboard && "!text-[20px]"
-              } px-5 !text-start`}
-            >
-              Orders Analytics
-            </h1>
-            {!isDashboard && (
-              <p className={`${styles.label} px-5`}>
-                Last 12 months analytics data
-              </p>
-            )}
-          </div>
-          <div
-            className={`w-full ${
-              !isDashboard ? "h-[90%]" : "h-full"
-            } flex items-center justify-center`}
-          >
-            <ResponsiveContainer
-              width={isDashboard ? "100%" : "90%"}
-              height={isDashboard ? "100%" : "50%"}
-            >
-              <LineChart
-                width={500}
-                height={300}
-                data={analyticsData}
-                margin={{
-                  top: 5,
-                  right: 30,
-                  left: 20,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="count" stroke="#82ca9d" />
+        <div className={isDashboard ? "h-full" : "h-full"}>
+          {!isDashboard && (
+            <div className="mb-8">
+              <h1 className={`${styles.title} !text-left`}>Orders Analytics</h1>
+              <p className={styles.label}>Lưu lượng đơn hàng 12 tháng qua</p>
+            </div>
+          )}
+          <div className={`${!isDashboard ? styles.card : ''} w-full ${!isDashboard ? 'h-[60vh] p-6' : 'h-full'} flex flex-col justify-center`}>
+            {isDashboard && <h2 className="text-lg font-Josefin font-bold text-black dark:text-white mb-4 px-2">Doanh thu tổng quan</h2>}
+            <ResponsiveContainer width="100%" height={isDashboard ? "80%" : "100%"}>
+              <LineChart data={analyticsData} margin={{ top: 5, right: 20, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#33333330" />
+                <XAxis dataKey="name" tick={{fill: '#888888', fontSize: 12}} axisLine={false} tickLine={false} />
+                <YAxis tick={{fill: '#888888', fontSize: 12}} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff'}} />
+                <Line type="monotone" dataKey="count" stroke="#10b981" strokeWidth={3} dot={{r: 4, fill: '#10b981', strokeWidth: 0}} activeDot={{r: 6}} />
               </LineChart>
             </ResponsiveContainer>
           </div>

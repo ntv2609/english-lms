@@ -3,11 +3,7 @@ import React from "react";
 import CourseDetailsPage from "../../components/Course/CourseDetailsPage";
 
 const Page = ({ params }: { params: { id: string } }) => {
-  return (
-    <div>
-      <CourseDetailsPage id={params.id} />
-    </div>
-  );
+  return <CourseDetailsPage id={params.id} />;
 };
 
 export default Page;

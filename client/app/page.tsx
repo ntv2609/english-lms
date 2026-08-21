@@ -8,27 +8,14 @@ import Reviews from "./components/Route/Reviews";
 import FAQ from "./components/FAQ/FAQ";
 import Footer from "./components/Footer";
 
-interface Props {}
-
-const Page: FC<Props> = (props) => {
+const Page: FC = () => {
   const [open, setOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState(0);
   const [route, setRoute] = useState("Login");
 
   return (
-    <div>
-      <Heading
-        title="ELearning"
-        description="ELearning is a platform for students to learn and get help from teachers"
-        keywords="Programming, MERN, Redux, Machine Learning"
-      />
-      <Header
-        open={open}
-        setOpen={setOpen}
-        activeItem={activeItem}
-        route={route}
-        setRoute={setRoute}
-      />
+    <div className="bg-white dark:bg-[#050505]">
+      <Heading title="EngGo - Premium English Platform" description="Tinh gọn, thực chiến và đột phá." keywords="English, IELTS, TOEIC" />
+      <Header open={open} setOpen={setOpen} activeItem={0} route={route} setRoute={setRoute} />
       <Hero />
       <Courses />
       <Reviews />

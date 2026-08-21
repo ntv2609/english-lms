@@ -9,131 +9,68 @@ import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
 import { signIn } from "next-auth/react";
 
-interface Props {
-  setRoute: (route: string) => void;
-}
+interface Props { setRoute: (route: string) => void; }
 
 const schema = Yup.object().shape({
-  name: Yup.string().required("Please enter your name"),
-  email: Yup.string().email("Invalid email").required("Please enter your email"),
-  password: Yup.string().min(6).required("Please enter your password"),
+  name: Yup.string().required("Bắt buộc"),
+  email: Yup.string().email("Email không hợp lệ").required("Bắt buộc"),
+  password: Yup.string().min(6, "Tối thiểu 6 ký tự").required("Bắt buộc"),
 });
 
 const SignUp: FC<Props> = ({ setRoute }) => {
   const [show, setShow] = useState(false);
-  const [register, { data, error, isSuccess, isError }] = useRegisterMutation();
+  const [register, { data, error, isSuccess }] = useRegisterMutation();
 
   useEffect(() => {
-    if (isSuccess) {
-      const message = data?.message || "Registration successful";
-      toast.success(message);
-      setRoute("Verification");
-    }
-    if (isError) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
-  }, [isSuccess, isError, data, error, setRoute]);
+    if (isSuccess) { toast.success("Đăng ký thành công, vui lòng xác nhận OTP"); setRoute("Verification"); }
+    if (error && "data" in error) toast.error((error as any).data.message);
+  }, [isSuccess, error, setRoute]);
 
   const formik = useFormik({
     initialValues: { name: "", email: "", password: "" },
     validationSchema: schema,
-    onSubmit: async ({ name, email, password }) => {
-      const formData = { name, email, password };
-      await register(formData);
-    },
+    onSubmit: async (v) => await register(v),
   });
 
   const { errors, touched, values, handleChange, handleSubmit } = formik;
 
   return (
     <div className="w-full">
-      <h1 className={`${styles.title}`}>Join to ELearning</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className={`${styles.label}`} htmlFor="name">
-            Enter your name
-          </label>
-          <input
-            type="text"
-            name=""
-            value={values.name}
-            onChange={handleChange}
-            id="name"
-            placeholder="John Doe"
-            className={`${errors.name && touched.name && "border-red-500"} ${styles.input}`}
-          />
-          {errors.name && touched.name && (
-            <span className="text-red-500 pt-2 block">{errors.name}</span>
-          )}
+      <div className="mb-8 text-center">
+        <h1 className="text-2xl font-Josefin font-bold text-black dark:text-white mb-2">Tạo tài khoản mới</h1>
+        <p className="text-sm text-neutral-500">Gia nhập cộng đồng 500k+ học viên</p>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className={styles.label}>Họ và Tên</label>
+          <input type="text" name="name" value={values.name} onChange={handleChange} className={styles.input} placeholder="Nguyễn Thế Vinh" />
+          {errors.name && touched.name && <span className="text-red-500 text-xs mt-1 block">{errors.name}</span>}
         </div>
-        <div className="mb-3">
-          <label className={`${styles.label}`} htmlFor="email">
-            Enter your email
-          </label>
-          <input
-            type="email"
-            name=""
-            value={values.email}
-            onChange={handleChange}
-            id="email"
-            placeholder="loginmail@gmail.com"
-            className={`${errors.email && touched.email && "border-red-500"} ${styles.input}`}
-          />
-          {errors.email && touched.email && (
-            <span className="text-red-500 pt-2 block">{errors.email}</span>
-          )}
+        <div>
+          <label className={styles.label}>Email</label>
+          <input type="email" name="email" value={values.email} onChange={handleChange} className={styles.input} placeholder="name@example.com" />
+          {errors.email && touched.email && <span className="text-red-500 text-xs mt-1 block">{errors.email}</span>}
         </div>
-        <div className="w-full mt-5 relative mb-1">
-          <label className={`${styles.label}`} htmlFor="password">
-            Enter your password
-          </label>
-          <input
-            type={!show ? "password" : "text"}
-            name="password"
-            value={values.password}
-            onChange={handleChange}
-            id="password"
-            placeholder="password!@%"
-            className={`${errors.password && touched.password && "border-red-500"} ${styles.input}`}
-          />
-          {!show ? (
-            <AiOutlineEyeInvisible
-              className="absolute bottom-3 right-2 z-1 cursor-pointer dark:text-white text-black"
-              size={20}
-              onClick={() => setShow(true)}
-            />
-          ) : (
-            <AiOutlineEye
-              className="absolute bottom-3 right-2 z-1 cursor-pointer dark:text-white text-black"
-              size={20}
-              onClick={() => setShow(false)}
-            />
-          )}
+        <div className="relative">
+          <label className={styles.label}>Mật khẩu</label>
+          <input type={show ? "text" : "password"} name="password" value={values.password} onChange={handleChange} className={styles.input} placeholder="••••••••" />
+          <div className="absolute right-3 top-10 cursor-pointer text-neutral-500 hover:text-black dark:hover:text-white" onClick={() => setShow(!show)}>
+            {show ? <AiOutlineEye size={20} /> : <AiOutlineEyeInvisible size={20} />}
+          </div>
+          {errors.password && touched.password && <span className="text-red-500 text-xs mt-1 block">{errors.password}</span>}
         </div>
-        {errors.password && touched.password && (
-          <span className="text-red-500 pt-2 block">{errors.password}</span>
-        )}
-        <div className="w-full mt-5">
-          <input type="submit" value="Sign Up" className={`${styles.button}`} />
-        </div>
-        <br />
-        <h5 className="text-center pt-4 font-Poppins text-[14px] text-black dark:text-white">
-          Or join with
-        </h5>
-        <div className="flex items-center justify-center my-3">
-          <FcGoogle size={30} className="cursor-pointer mr-2" onClick={() => signIn("google")} />
-          <AiFillGithub size={30} className="cursor-pointer ml-2 dark:text-white text-black" onClick={() => signIn("github")} />
-        </div>
-        <h5 className="text-center pt-4 font-Poppins text-[14px] dark:text-white text-black">
-          Already have an account?{" "}
-          <span className="text-[#2190ff] pl-1 cursor-pointer" onClick={() => setRoute("Login")}>
-            Sign in
-          </span>
-        </h5>
+        <button type="submit" className={styles.button + " !mt-8"}>Đăng ký</button>
       </form>
+      <div className="mt-8 flex items-center justify-between border-t border-black/10 dark:border-white/10 pt-6">
+        <span className="text-xs text-neutral-500 font-medium uppercase tracking-widest bg-white dark:bg-[#0A0A0A] px-2 absolute left-1/2 -translate-x-1/2 -mt-[33px]">Hoặc</span>
+        <div className="flex w-full gap-4">
+          <button onClick={() => signIn("google")} className="flex-1 flex items-center justify-center gap-2 py-2 border border-black/10 dark:border-white/10 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-sm font-medium text-black dark:text-white"><FcGoogle size={20}/> Google</button>
+          <button onClick={() => signIn("github")} className="flex-1 flex items-center justify-center gap-2 py-2 border border-black/10 dark:border-white/10 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-sm font-medium text-black dark:text-white"><AiFillGithub size={20}/> GitHub</button>
+        </div>
+      </div>
+      <p className="text-center text-sm text-neutral-500 mt-6">
+        Đã có tài khoản? <span className="text-blue-500 font-semibold cursor-pointer hover:underline" onClick={() => setRoute("Login")}>Đăng nhập</span>
+      </p>
     </div>
   );
 };

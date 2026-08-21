@@ -1,6 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 import { useUpdatePasswordMutation } from '@/redux/features/user/userApi';
 import toast from 'react-hot-toast';
+import { styles } from '@/app/styles/style';
 
 const ChangePassword: FC = () => {
   const [oldPassword, setOldPassword] = useState('');
@@ -10,70 +11,33 @@ const ChangePassword: FC = () => {
 
   const passwordChangeHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match');
-    } else {
-      await updatePassword({ oldPassword, newPassword });
-    }
+    if (newPassword !== confirmPassword) toast.error('Mật khẩu xác nhận không khớp!');
+    else await updatePassword({ oldPassword, newPassword });
   };
 
   useEffect(() => {
-    if (isSuccess) {
-      toast.success('Password changed successfully');
-    }
-    if (error) {
-      if ('data' in error) {
-        const errorData = error as any;
-        toast.error(errorData.data.message);
-      }
-    }
+    if (isSuccess) { toast.success('Đổi mật khẩu thành công!'); setOldPassword(''); setNewPassword(''); setConfirmPassword(''); }
+    if (error && 'data' in error) toast.error((error as any).data.message);
   }, [isSuccess, error]);
 
   return (
-    <div className="w-full pl-7 px-2 800px:px-5 800px:pl-0">
-      <h1 className="block text-[25px] 800px:text-[30px] font-Poppins text-center font-[500] text-black dark:text-white pb-2">
-        Change Password
-      </h1>
-      <div className="w-full">
-        <form onSubmit={passwordChangeHandler} className="flex flex-col items-center">
-          <div className="w-[100%] 800px:w-[60%] mt-5">
-            <label className="block pb-2 dark:text-white text-black">Enter your old password</label>
-            <input
-              type="password"
-              className="w-full border rounded p-2 dark:text-white text-black dark:bg-slate-900 bg-transparent mb-4"
-              required
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-            />
-          </div>
-          <div className="w-[100%] 800px:w-[60%] mt-2">
-            <label className="block pb-2 dark:text-white text-black">Enter your new password</label>
-            <input
-              type="password"
-              className="w-full border rounded p-2 dark:text-white text-black dark:bg-slate-900 bg-transparent mb-4"
-              required
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-          </div>
-          <div className="w-[100%] 800px:w-[60%] mt-2">
-            <label className="block pb-2 dark:text-white text-black">Enter your confirm password</label>
-            <input
-              type="password"
-              className="w-full border rounded p-2 dark:text-white text-black dark:bg-slate-900 bg-transparent mb-4"
-              required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-            <input
-              type="submit"
-              required
-              value="Update"
-              className="w-full border-[#37a39a] border rounded p-2 mt-8 cursor-pointer dark:text-white text-black"
-            />
-          </div>
-        </form>
-      </div>
+    <div className="max-w-xl">
+      <h1 className="text-3xl font-Josefin font-bold text-black dark:text-white mb-8">Bảo mật</h1>
+      <form onSubmit={passwordChangeHandler} className="space-y-6">
+        <div>
+          <label className={styles.label}>Mật khẩu hiện tại</label>
+          <input type="password" required className={styles.input} value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+        </div>
+        <div>
+          <label className={styles.label}>Mật khẩu mới</label>
+          <input type="password" required className={styles.input} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+        </div>
+        <div>
+          <label className={styles.label}>Xác nhận mật khẩu mới</label>
+          <input type="password" required className={styles.input} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+        </div>
+        <button type="submit" className={`${styles.button} !w-40 mt-4`}>Cập nhật</button>
+      </form>
     </div>
   );
 };

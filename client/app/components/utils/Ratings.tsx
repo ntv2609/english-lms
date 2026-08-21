@@ -2,44 +2,16 @@ import React, { FC } from "react";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { BsStarHalf } from "react-icons/bs";
 
-interface Props {
-  rating: number;
-}
+interface Props { rating: number; }
 
 const Ratings: FC<Props> = ({ rating }) => {
   const stars = [];
-
   for (let i = 1; i <= 5; i++) {
-    if (i <= rating) {
-      stars.push(
-        <AiFillStar
-          key={i}
-          size={20}
-          color="#f6b100"
-          className="mr-2 cursor-pointer"
-        />
-      );
-    } else if (i === Math.ceil(rating) && !Number.isInteger(rating)) {
-      stars.push(
-        <BsStarHalf
-          key={i}
-          size={17}
-          color="#f6ba00"
-          className="mr-2 cursor-pointer"
-        />
-      );
-    } else {
-      stars.push(
-        <AiOutlineStar
-          key={i}
-          size={20}
-          color="#f6ba00"
-          className="mr-2 cursor-pointer"
-        />
-      );
-    }
+    if (i <= rating) stars.push(<AiFillStar key={i} size={14} className="text-black dark:text-white mr-0.5" />);
+    else if (i === Math.ceil(rating) && !Number.isInteger(rating)) stars.push(<BsStarHalf key={i} size={13} className="text-black dark:text-white mr-0.5" />);
+    else stars.push(<AiOutlineStar key={i} size={14} className="text-black dark:text-white opacity-30 mr-0.5" />);
   }
-  return <div className="flex mt-1 ml-2 800px:mt-0 800px:ml-0">{stars}</div>;
+  return <div className="flex items-center">{stars}</div>;
 };
 
 export default Ratings;

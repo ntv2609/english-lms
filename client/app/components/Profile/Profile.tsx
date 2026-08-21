@@ -8,102 +8,52 @@ import ChangePassword from "./ChangePassword";
 import CourseCard from "../Course/CourseCard";
 import { useGetUsersAllCoursesQuery } from "@/redux/features/courses/coursesApi";
 
-type Props = {
-  user: any;
-};
+type Props = { user: any; };
 
 const Profile: FC<Props> = ({ user }) => {
-  const [scroll, setScroll] = useState(false);
-  const [avatar, setAvatar] = useState(user?.avatar ? user.avatar.url : null);
   const [active, setActive] = useState(1);
   const [logout, setLogout] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
-  
-  const { data, isLoading } = useGetUsersAllCoursesQuery(undefined, {});
+  const { data } = useGetUsersAllCoursesQuery(undefined, {});
+  useLogoutQuery(undefined, { skip: !logout });
 
-  const {} = useLogoutQuery(undefined, {
-    skip: !logout ? true : false,
-  });
+  const logOutHandler = async () => { setLogout(true); await signOut(); };
 
-  const logOutHandler = async () => {
-    setLogout(true);
-    await signOut();
-  };
-
-  // Logic map khóa học user đã mua với khoá học từ DB
   useEffect(() => {
     if (data && user?.courses) {
-      const filteredCourses = user.courses
-        .map((userCourse: any) =>
-          data.courses.find((course: any) => course._id === userCourse.courseId)
-        )
-        .filter((course: any) => course !== undefined);
-      setCourses(filteredCourses);
+      const arr = user.courses.map((uc: any) => data.courses.find((c: any) => c._id === uc.courseId)).filter(Boolean);
+      setCourses(arr);
     }
   }, [data, user]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (typeof window !== "undefined") {
-        if (window.scrollY > 85) {
-          setScroll(true);
-        } else {
-          setScroll(false);
-        }
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
-    <div className="w-[85%] flex mx-auto">
-      <div
-        className={`w-[60px] 800px:w-[310px] h-[450px] dark:bg-slate-900 bg-opacity-90 border bg-white dark:border-[#ffffff1d] border-[#00000014] rounded-[5px] shadow-sm dark:shadow-sm mt-[80px] mb-[80px] sticky ${
-          scroll ? "top-[120px]" : "top-[30px]"
-        } left-[30px]`}
-      >
-        <SideBarProfile
-          user={user}
-          active={active}
-          avatar={avatar}
-          setActive={setActive}
-          logOutHandler={logOutHandler}
-        />
-      </div>
-      
-      {/* 1. Thông tin tài khoản */}
-      {active === 1 && (
-        <div className="w-full h-full bg-transparent mt-[80px]">
-          <ProfileInfo avatar={avatar} user={user} />
-        </div>
-      )}
-      
-      {/* 2. Đổi mật khẩu */}
-      {active === 2 && (
-        <div className="w-full h-full bg-transparent mt-[80px]">
-          <ChangePassword />
-        </div>
-      )}
-      
-      {/* 3. Khóa học đã đăng ký */}
-      {active === 3 && (
-        <div className="w-full pl-7 px-2 800px:px-10 800px:pl-8 mt-[80px]">
-          <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[25px] lg:grid-cols-2 lg:gap-[25px] 1500px:grid-cols-3 1500px:gap-[35px] mb-12 border-0">
-            {courses &&
-              courses.map((item: any, index: number) => (
-                <CourseCard item={item} key={index} isProfile={true} />
-              ))}
+    <div className="bg-[#FAFAFA] dark:bg-[#050505] min-h-[85vh] pt-24 pb-20">
+      <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row gap-12">
+        <div className="w-full md:w-[250px] shrink-0">
+          <div className="sticky top-28">
+            <SideBarProfile user={user} active={active} avatar={user?.avatar?.url} setActive={setActive} logOutHandler={logOutHandler} />
           </div>
-          {courses.length === 0 && (
-            <h1 className="text-center text-[18px] font-Poppins dark:text-white text-black">
-              Bạn chưa đăng ký khóa học nào!
-            </h1>
+        </div>
+        
+        <div className="flex-1">
+          {active === 1 && <ProfileInfo avatar={user?.avatar?.url} user={user} />}
+          {active === 2 && <ChangePassword />}
+          {active === 3 && (
+            <div>
+              <h1 className="text-3xl font-Josefin font-bold text-black dark:text-white mb-8">Khóa học của tôi</h1>
+              {courses.length === 0 ? (
+                <div className="py-20 text-center border border-dashed border-black/20 dark:border-white/20 rounded-xl">
+                   <p className="text-neutral-500 font-medium">Chưa có khóa học nào. Khám phá ngay!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {courses.map((item: any, i: number) => <CourseCard item={item} key={i} isProfile={true} />)}
+                </div>
+              )}
+            </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

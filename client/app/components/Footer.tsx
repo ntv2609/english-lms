@@ -3,54 +3,49 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer>
-      <div className="border border-[#0000000e] dark:border-[#ffffff1e]" />
-      <br />
-      <div className="w-[95%] 800px:w-full 800px:max-w-[85%] mx-auto px-2 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
-          <div className="space-y-3">
-            <h3 className="text-[20px] font-[600] text-black dark:text-white">Giới thiệu</h3>
-            <ul className="space-y-4">
-              <li><Link href="/about" className="text-base text-black dark:text-gray-300 dark:hover:text-white">Về chúng tôi</Link></li>
-              <li><Link href="/privacy-policy" className="text-base text-black dark:text-gray-300 dark:hover:text-white">Chính sách bảo mật</Link></li>
-              <li><Link href="/faq" className="text-base text-black dark:text-gray-300 dark:hover:text-white">FAQ</Link></li>
+    <footer className="border-t border-black/5 dark:border-white/5 bg-[#FAFAFA] dark:bg-[#050505]">
+      <div className="max-w-[1200px] mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
+          <div className="md:col-span-4 space-y-6">
+            <Link href="/" className="text-2xl font-Josefin font-bold tracking-tight text-black dark:text-white">EngGo.</Link>
+            <p className="text-sm text-neutral-500 leading-relaxed max-w-xs">Nền tảng học tiếng Anh chuẩn quốc tế. Tối giản, hiện đại và tập trung hoàn toàn vào chất lượng.</p>
+          </div>
+          
+          <div className="md:col-span-2 space-y-4">
+            <h3 className="text-[10px] font-bold tracking-widest uppercase text-neutral-900 dark:text-neutral-100">Hệ sinh thái</h3>
+            <ul className="space-y-3">
+              <li><Link href="/courses" className="text-sm text-neutral-500 hover:text-black dark:hover:text-white transition-colors">Khóa học</Link></li>
+              <li><Link href="/about" className="text-sm text-neutral-500 hover:text-black dark:hover:text-white transition-colors">Về chúng tôi</Link></li>
+              <li><Link href="/policy" className="text-sm text-neutral-500 hover:text-black dark:hover:text-white transition-colors">Chính sách</Link></li>
             </ul>
           </div>
-          <div className="space-y-3">
-            <h3 className="text-[20px] font-[600] text-black dark:text-white">Truy cập nhanh</h3>
-            <ul className="space-y-4">
-              <li><Link href="/courses" className="text-base text-black dark:text-gray-300 dark:hover:text-white">Khóa học</Link></li>
-              <li><Link href="/profile" className="text-base text-black dark:text-gray-300 dark:hover:text-white">Tài khoản</Link></li>
-              <li><Link href="/course-dashboard" className="text-base text-black dark:text-gray-300 dark:hover:text-white">Không gian học tập</Link></li>
+
+          <div className="md:col-span-2 space-y-4">
+            <h3 className="text-[10px] font-bold tracking-widest uppercase text-neutral-900 dark:text-neutral-100">Cộng đồng</h3>
+            <ul className="space-y-3">
+              <li><a href="#" className="text-sm text-neutral-500 hover:text-black dark:hover:text-white transition-colors">Facebook</a></li>
+              <li><a href="#" className="text-sm text-neutral-500 hover:text-black dark:hover:text-white transition-colors">Instagram</a></li>
+              <li><a href="https://github.com/ntv2609" className="text-sm text-neutral-500 hover:text-black dark:hover:text-white transition-colors">GitHub</a></li>
             </ul>
           </div>
-          <div className="space-y-3">
-            <h3 className="text-[20px] font-[600] text-black dark:text-white">Mạng xã hội</h3>
-            <ul className="space-y-4">
-              <li><Link href="https://www.facebook.com/vingng00" className="text-base text-black dark:text-gray-300 dark:hover:text-white">Facebook</Link></li>
-              <li><Link href="https://www.instagram.com/ngvinh26_" className="text-base text-black dark:text-gray-300 dark:hover:text-white">Instagram</Link></li>
-              <li><Link href="https://github.com/ntv2609" className="text-base text-black dark:text-gray-300 dark:hover:text-white">GitHub</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-[20px] font-[600] text-black dark:text-white pb-3">Contact Info</h3>
-            <p className="text-base text-black dark:text-gray-300 dark:hover:text-white pb-2">
-              Liên hệ: 096 703 2357
-            </p>
-            <p className="text-base text-black dark:text-gray-300 dark:hover:text-white pb-2">
-              Địa chỉ: Đại học Công nghiệp Hà Nội (HaUI)
-            </p>
-            <p className="text-base text-black dark:text-gray-300 dark:hover:text-white pb-2">
-              Email: ntv2609@gmail.com
-            </p>
+
+          <div className="md:col-span-4 space-y-4">
+            <h3 className="text-[10px] font-bold tracking-widest uppercase text-neutral-900 dark:text-neutral-100">Liên hệ</h3>
+            <div className="space-y-3">
+              <p className="text-sm text-neutral-500 font-mono">ntv2609@gmail.com</p>
+              <p className="text-sm text-neutral-500 font-mono">+84 96 703 2357</p>
+              <p className="text-sm text-neutral-500">ĐH Công nghiệp Hà Nội (HaUI)</p>
+            </div>
           </div>
         </div>
-        <br />
-        <p className="text-center text-black dark:text-white">
-          ©Copyright VinhDzaiCorp 2026
-        </p>
+
+        <div className="flex flex-col md:flex-row justify-between items-center mt-16 pt-8 border-t border-black/5 dark:border-white/5">
+          <p className="text-xs font-mono text-neutral-400">© 2026 EngGo. All rights reserved.</p>
+          <div className="flex gap-4 mt-4 md:mt-0">
+             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="System Operational"></span>
+          </div>
+        </div>
       </div>
-      <br />
     </footer>
   );
 };

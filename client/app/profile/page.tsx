@@ -9,19 +9,14 @@ import { useSelector } from 'react-redux';
 
 const Page = () => {
   const [open, setOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState(5);
   const [route, setRoute] = useState('Login');
   const { user } = useSelector((state: any) => state.auth);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-[#050505]">
       <Protected>
-        <Heading
-          title={`${user?.name} profile - eLearning`}
-          description="E-learning is a platform for students to learn and get help from teachers"
-          keywords="Programming, MERN, Redux, Machine Learning"
-        />
-        <Header open={open} setOpen={setOpen} activeItem={activeItem} setRoute={setRoute} route={route} />
+        <Heading title={`Hồ sơ | ${user?.name}`} description="Hồ sơ cá nhân" keywords="Profile" />
+        <Header open={open} setOpen={setOpen} activeItem={5} setRoute={setRoute} route={route} />
         <Profile user={user} />
         <Footer />
       </Protected>

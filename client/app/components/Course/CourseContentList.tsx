@@ -2,119 +2,47 @@ import React, { FC, useState } from "react";
 import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 import { MdOutlineOndemandVideo } from "react-icons/md";
 
-interface Props {
-  data: any;
-  activeVideo?: number;
-  setActiveVideo?: any;
-  isDemo?: boolean;
-}
+interface Props { data: any; activeVideo?: number; setActiveVideo?: any; isDemo?: boolean; }
 
-const CourseContentList: FC<Props> = ({
-  data,
-  activeVideo,
-  setActiveVideo,
-  isDemo,
-}) => {
-  const [visibleSections, setVisibleSections] = useState<Set<string>>(
-    new Set<string>()
-  );
-
-  const videoSections: string[] = [
-    ...new Set<string>(data?.map((item: any) => item.videoSection)),
-  ];
-
+const CourseContentList: FC<Props> = ({ data, activeVideo, setActiveVideo, isDemo }) => {
+  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set(data?.map((i:any)=>i.videoSection)));
+  const videoSections = [...new Set<string>(data?.map((item: any) => item.videoSection))];
   let totalCount = 0;
 
-  const toggleSection = (section: string) => {
-    const newVisibleSections = new Set(visibleSections);
-    if (newVisibleSections.has(section)) {
-      newVisibleSections.delete(section);
-    } else {
-      newVisibleSections.add(section);
-    }
-    setVisibleSections(newVisibleSections);
+  const toggleSection = (s: string) => {
+    const v = new Set(visibleSections);
+    v.has(s) ? v.delete(s) : v.add(s);
+    setVisibleSections(v);
   };
 
   return (
-    <div className={`mt-[15px] w-full ${!isDemo && "ml-[-30px] min-h-screen sticky top-24"}`}>
-      {videoSections.map((section: string, sectionIndex: number) => {
-        const isSectionVisible = visibleSections.has(section);
-
-        const sectionVideos: any[] = data.filter(
-          (item: any) => item.videoSection === section
-        );
-
-        const sectionVideoCount: number = sectionVideos.length;
-        const sectionVideoLength: number = sectionVideos.reduce(
-          (totalLength: number, item: any) => totalLength + item.videoLength,
-          0
-        );
-
-        const sectionStartIndex: number = totalCount;
-        totalCount += sectionVideoCount;
-
-        const sectionContentHours: number = sectionVideoLength / 60;
+    <div className={`w-full ${!isDemo ? "sticky top-24 max-h-[80vh] overflow-y-auto pr-2 custom-scrollbar" : ""}`}>
+      {videoSections.map((section: string) => {
+        const isVisible = visibleSections.has(section);
+        const sectionVideos = data.filter((item: any) => item.videoSection === section);
+        const secStart = totalCount; totalCount += sectionVideos.length;
 
         return (
-          <div className={`${!isDemo && "border-b border-[#ffffff8e] pb-2"}`} key={section}>
-            <div className="w-full flex">
-              <div className="w-full flex justify-between items-center">
-                <h2 className="text-[22px] text-black dark:text-white">
-                  {section}
-                </h2>
-                <button
-                  className="mr-4 cursor-pointer text-black dark:text-white"
-                  onClick={() => toggleSection(section)}
-                >
-                  {isSectionVisible ? (
-                    <BsChevronUp size={20} />
-                  ) : (
-                    <BsChevronDown size={20} />
-                  )}
-                </button>
-              </div>
+          <div key={section} className="mb-4 bg-black/5 dark:bg-white/5 rounded-lg overflow-hidden border border-black/5 dark:border-white/5">
+            <div className="p-4 cursor-pointer flex justify-between items-center bg-black/5 dark:bg-black/20" onClick={() => toggleSection(section)}>
+              <h2 className="font-Josefin font-semibold text-sm text-black dark:text-white leading-tight">{section}</h2>
+              {isVisible ? <BsChevronUp className="text-neutral-500 shrink-0 ml-2" size={14} /> : <BsChevronDown className="text-neutral-500 shrink-0 ml-2" size={14} />}
             </div>
-            <h5 className="text-black dark:text-white">
-              {sectionVideoCount} Lessons ·{" "}
-              {sectionVideoLength < 60
-                ? sectionVideoLength
-                : sectionContentHours.toFixed(2)}{" "}
-              {sectionVideoLength > 60 ? "Hours" : "Minutes"}
-            </h5>
-            <br />
-            {isSectionVisible && (
-              <div className="w-full">
+            
+            {isVisible && (
+              <div className="divide-y divide-black/5 dark:divide-white/5">
                 {sectionVideos.map((item: any, index: number) => {
-                  const videoIndex: number = sectionStartIndex + index;
-                  const contentLength: number = item.videoLength / 60;
+                  const vidIdx = secStart + index;
+                  const isActive = vidIdx === activeVideo;
                   return (
-                    <div
-                      className={`w-full ${
-                        videoIndex === activeVideo ? "bg-slate-800" : ""
-                      } cursor-pointer transition-all p-2`}
-                      key={item._id}
-                      onClick={() =>
-                        isDemo ? null : setActiveVideo(videoIndex)
-                      }
-                    >
-                      <div className="flex items-start">
+                    <div key={item._id} onClick={() => !isDemo && setActiveVideo(vidIdx)} className={`p-4 cursor-pointer transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${isActive ? "bg-blue-500/10 dark:bg-blue-500/10 border-l-2 border-blue-500" : "border-l-2 border-transparent"}`}>
+                      <div className="flex gap-3">
+                        <MdOutlineOndemandVideo size={18} className={`shrink-0 mt-0.5 ${isActive ? "text-blue-500" : "text-neutral-400"}`} />
                         <div>
-                          <MdOutlineOndemandVideo
-                            size={25}
-                            className="mr-2"
-                            color="#1cdada"
-                          />
+                          <h4 className={`text-sm font-medium leading-snug ${isActive ? "text-blue-600 dark:text-blue-400" : "text-neutral-700 dark:text-neutral-300"}`}>{item.title}</h4>
+                          <p className="text-xs font-mono text-neutral-500 mt-1">{item.videoLength} phút</p>
                         </div>
-                        <h1 className="text-[18px] inline-block break-words text-black dark:text-white">
-                          {item.title}
-                        </h1>
                       </div>
-                      <h5 className="pl-8 text-black dark:text-white">
-                        {item.videoLength > 60
-                          ? contentLength.toFixed(2)
-                          : item.videoLength}{" "}
-                        {item.videoLength > 60 ? "hours" : "minutes"}
-                      </h5>
                     </div>
                   );
                 })}

@@ -5,11 +5,7 @@ import { redirect } from "next/navigation";
 import React, { useEffect } from "react";
 import CourseContent from "@/app/components/Course/CourseContent";
 
-type Props = {
-  params: {
-    id: string;
-  };
-};
+type Props = { params: { id: string; }; };
 
 const Page = ({ params }: Props) => {
   const id = params.id;
@@ -17,29 +13,12 @@ const Page = ({ params }: Props) => {
 
   useEffect(() => {
     if (data) {
-      const isPurchased = data.user.courses.find(
-        (item: any) => item.courseId === id
-      );
-      if (!isPurchased) {
-        redirect("/");
-      }
+      if (!data.user.courses.find((item: any) => item.courseId === id)) redirect("/");
     }
-    if (error) {
-      redirect("/");
-    }
+    if (error) redirect("/");
   }, [data, error, id]);
 
-  return (
-    <>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <div>
-          <CourseContent id={id} user={data?.user} />
-        </div>
-      )}
-    </>
-  );
+  return <>{isLoading ? <Loader /> : <CourseContent id={id} user={data?.user} />}</>;
 };
 
 export default Page;

@@ -2,35 +2,34 @@ import { useGetUsersAllCoursesQuery } from "@/redux/features/courses/coursesApi"
 import React, { useEffect, useState } from "react";
 import CourseCard from "../Course/CourseCard";
 import Loader from "../Loader/Loader";
+import { styles } from "@/app/styles/style";
+import Link from "next/link";
 
 const Courses = () => {
   const { data, isLoading } = useGetUsersAllCoursesQuery({});
-  const [courses, setCourses] = useState<any[]>([]);
-
-  useEffect(() => {
-    setCourses(data?.courses);
-  }, [data]);
-
+  
   return (
     <>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <div>
-          <div className={`w-[90%] 800px:w-[80%] m-auto`}>
-            <h1 className="text-center font-Poppins text-[25px] leading-[35px] sm:text-3xl lg:text-4xl dark:text-white 800px:!leading-[60px] text-[#000] font-[700] tracking-tight">
-              Khám phá các khóa học <span className="text-gradient">hấp dẫn</span>
-            </h1>
-            <br />
-            <br />
-            <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-[25px] 1500px:grid-cols-4 1500px:gap-[35px] mb-12 border-0">
-              {courses &&
-                courses.map((item: any, index: number) => (
-                  <CourseCard item={item} key={index} />
-                ))}
+      {isLoading ? <Loader /> : (
+        <section className="py-24 bg-white dark:bg-[#050505]">
+          <div className="max-w-[1400px] mx-auto px-6">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+              <div className="max-w-2xl">
+                <h2 className={`${styles.title} !text-left md:!text-[56px] leading-tight`}>
+                  Khởi động hành trình <br/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-emerald-400">chinh phục tiếng Anh.</span>
+                </h2>
+              </div>
+              <Link href="/courses" className="text-sm font-bold uppercase tracking-widest text-black dark:text-white hover:text-blue-500 transition-colors flex items-center gap-2">
+                Xem tất cả <span>→</span>
+              </Link>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {data?.courses?.slice(0,8).map((item: any, i: number) => <CourseCard item={item} key={i} />)}
             </div>
           </div>
-        </div>
+        </section>
       )}
     </>
   );

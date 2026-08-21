@@ -4,51 +4,49 @@ import Image from "next/image";
 import Ratings from "../utils/Ratings";
 import { AiOutlineUnorderedList } from "react-icons/ai";
 
-interface Props {
-  item: any;
-  isProfile?: boolean;
-}
+interface Props { item: any; isProfile?: boolean; }
 
 const CourseCard: FC<Props> = ({ item, isProfile }) => {
   return (
-    <Link href={!isProfile ? `/course/${item._id}` : `course-access/${item._id}`}>
-      <div className="w-full min-h-[35vh] dark:bg-slate-500 dark:bg-opacity-20 backdrop-blur border dark:border-[#ffffff1d] border-[#00000015] dark:shadow-[bg-slate-700] rounded-lg p-3 shadow-sm dark:shadow-inner">
-        <Image
-          src={item.thumbnail?.url}
-          width={500}
-          height={300}
-          objectFit="contain"
-          className="rounded w-full"
-          alt="thumbnail"
-        />
-        <br />
-        <h1 className="font-Poppins text-[16px] text-black dark:text-[#fff]">
-          {item.name}
-        </h1>
-        <div className="w-full flex items-center justify-between pt-2">
-          <Ratings rating={item.ratings} />
-          {!isProfile && (
-            <h5 className={`text-black dark:text-[#fff] `}>
-              {item.purchased} Học viên
-            </h5>
-          )}
+    <Link href={!isProfile ? `/course/${item._id}` : `course-access/${item._id}`} className="group block h-full">
+      <div className="w-full h-full bg-white dark:bg-[#0A0A0A] border border-black/5 dark:border-white/5 hover:border-black/20 dark:hover:border-white/20 transition-all duration-300 ease-out flex flex-col relative overflow-hidden group-hover:-translate-y-1">
+        
+        {/* Aspect Ratio Box for Image */}
+        <div className="w-full aspect-[16/9] relative overflow-hidden bg-neutral-100 dark:bg-neutral-900 border-b border-black/5 dark:border-white/5">
+          <Image src={item.thumbnail?.url || "/assets/banner.png"} fill className="object-cover transition-transform duration-700 ease-out group-hover:scale-105" alt="course thumbnail" />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 z-10"/>
         </div>
-        <div className="w-full flex items-center justify-between pt-3">
-          <div className="flex">
-            <h3 className="text-black dark:text-[#fff]">
-              {item.price === 0 ? "Miễn phí" : item.price + "$"}
-            </h3>
-            <h5 className="pl-3 text-[14px] mt-[-5px] line-through opacity-80 text-black dark:text-[#fff]">
-              {item.estimatedPrice}$
-            </h5>
+
+        <div className="p-5 flex-1 flex flex-col">
+          {/* Tag & Rating row */}
+          <div className="flex items-center justify-between mb-3">
+             <span className="text-[10px] font-bold tracking-widest uppercase text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-1 rounded">
+               {item.categories || "Khoá học"}
+             </span>
+             <Ratings rating={item.ratings} />
           </div>
-          <div className="flex items-center pb-3">
-            <AiOutlineUnorderedList size={20} fill="#fff" />
-            <h5 className="pl-2 text-black dark:text-[#fff]">
-              {item.courseData?.length} Bài giảng
-            </h5>
+
+          <h3 className="font-Josefin font-bold text-lg text-black dark:text-white leading-snug mb-4 line-clamp-2">
+            {item.name}
+          </h3>
+
+          <div className="mt-auto">
+            <div className="flex items-center justify-between pt-4 border-t border-black/5 dark:border-white/5">
+              <div className="flex items-baseline gap-2">
+                <span className="font-mono text-lg font-bold text-black dark:text-white">
+                  {item.price === 0 ? "Free" : `$${item.price}`}
+                </span>
+                {item.estimatedPrice && <span className="font-mono text-xs text-neutral-400 line-through">${item.estimatedPrice}</span>}
+              </div>
+              
+              <div className="flex items-center gap-4 text-xs font-medium text-neutral-500">
+                <span className="flex items-center gap-1"><AiOutlineUnorderedList /> {item.courseData?.length || 0} Lss.</span>
+                {!isProfile && <span>{item.purchased || 0} Std.</span>}
+              </div>
+            </div>
           </div>
         </div>
+
       </div>
     </Link>
   );

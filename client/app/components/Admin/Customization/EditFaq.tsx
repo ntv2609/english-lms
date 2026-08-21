@@ -4,165 +4,61 @@ import { useEditLayoutMutation, useGetHeroDataQuery } from "@/redux/features/lay
 import { toast } from "react-hot-toast";
 import { AiOutlineDelete } from "react-icons/ai";
 import { IoMdAddCircleOutline } from "react-icons/io";
-import { HiOutlineChevronDown, HiOutlineChevronUp } from "react-icons/hi";
 import { styles } from "@/app/styles/style";
 import Loader from "../../Loader/Loader";
 
 const EditFaq: FC = () => {
-  const { data, isLoading, refetch } = useGetHeroDataQuery("FAQ", {
-    refetchOnMountOrArgChange: true,
-  });
-
+  const { data, isLoading, refetch } = useGetHeroDataQuery("FAQ", { refetchOnMountOrArgChange: true });
   const [editLayout, { isSuccess, error }] = useEditLayoutMutation();
-
   const [questions, setQuestions] = useState<any[]>([]);
 
   useEffect(() => {
-    if (data) {
-      setQuestions(data?.layout?.faq || []);
-    }
-    if (isSuccess) {
-      refetch();
-      toast.success("FAQ updated successfully");
-    }
-    if (error) {
-      if ("data" in error) {
-        const errorData = error as any;
-        toast.error(errorData?.data?.message);
-      }
-    }
+    if (data) setQuestions(data?.layout?.faq || []);
+    if (isSuccess) { refetch(); toast.success("Cập nhật FAQ thành công"); }
+    if (error && "data" in error) toast.error((error as any)?.data?.message);
   }, [data, isSuccess, error, refetch]);
 
-  const toggleQuestion = (id: any) => {
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((q) => (q._id === id ? { ...q, active: !q.active } : q))
-    );
-  };
-
-  const handleQuestionChange = (id: any, value: string) => {
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((q) => (q._id === id ? { ...q, question: value } : q))
-    );
-  };
-
-  const handleAnswerChange = (id: any, value: string) => {
-    setQuestions((prevQuestions) =>
-      prevQuestions.map((q) => (q._id === id ? { ...q, answer: value } : q))
-    );
-  };
-
-  const newFaqHandler = () => {
-    setQuestions([
-      ...questions,
-      {
-        _id: Date.now().toString(),
-        question: "",
-        answer: "",
-      },
-    ]);
-  };
-
-  const areQuestionsUnchanged = (originalQuestions: any[], newQuestions: any[]) => {
-    return JSON.stringify(originalQuestions) === JSON.stringify(newQuestions);
-  };
-
-  const isAnyQuestionEmpty = (questions: any[]) => {
-    return questions.some((q) => q.question === "" || q.answer === "");
-  };
-
   const handleEdit = async () => {
-    if (
-      !areQuestionsUnchanged(data?.layout?.faq || [], questions) &&
-      !isAnyQuestionEmpty(questions)
-    ) {
-      await editLayout({
-        type: "FAQ",
-        faq: questions,
-      });
+    if (JSON.stringify(data?.layout?.faq || []) !== JSON.stringify(questions) && !questions.some(q => q.question === "" || q.answer === "")) {
+      await editLayout({ type: "FAQ", faq: questions });
     }
   };
 
   return (
     <>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <div className="w-[90%] 800px:w-[80%] m-auto mt-[120px]">
-          <div className="mt-12">
-            <dl className="space-y-8">
-              {questions.map((q: any, index: number) => (
-                <div
-                  key={q._id}
-                  className={`${
-                    q._id !== questions[0]?._id ? "border-t" : ""
-                  } border-gray-200 pt-6`}
-                >
-                  <dt className="text-lg">
-                    <button
-                      className="flex items-start dark:text-white text-black justify-between w-full text-left focus:outline-none"
-                      onClick={() => toggleQuestion(q._id)}
-                    >
-                      <input
-                        className={`${styles.input} border-none`}
-                        value={q.question}
-                        onChange={(e: any) => handleQuestionChange(q._id, e.target.value)}
-                        placeholder="Add your question..."
-                      />
-                      <span className="ml-6 flex-shrink-0">
-                        {q.active ? (
-                          <HiOutlineChevronUp className="h-6 w-6" />
-                        ) : (
-                          <HiOutlineChevronDown className="h-6 w-6" />
-                        )}
-                      </span>
-                    </button>
-                  </dt>
-                  {q.active && (
-                    <dd className="mt-2 pr-12">
-                      <input
-                        className={`${styles.input} border-none`}
-                        value={q.answer}
-                        onChange={(e: any) => handleAnswerChange(q._id, e.target.value)}
-                        placeholder="Add your answer..."
-                      />
-                      <span className="ml-6 flex-shrink-0 flex justify-end">
-                        <AiOutlineDelete
-                          className="dark:text-white text-black text-[18px] cursor-pointer"
-                          onClick={() => {
-                            setQuestions((prevQuestions) =>
-                              prevQuestions.filter((item) => item._id !== q._id)
-                            );
-                          }}
-                        />
-                      </span>
-                    </dd>
-                  )}
+      {isLoading ? <Loader /> : (
+        <div className="max-w-4xl m-auto">
+          <div className="mb-8">
+            <h1 className={`${styles.title} !text-left !pb-1`}>FAQ / Hỏi đáp</h1>
+            <p className={styles.label}>Tùy chỉnh nội dung giải đáp thắc mắc cho học viên</p>
+          </div>
+
+          <div className="space-y-6 mb-8">
+            {questions.map((q: any) => (
+              <div key={q._id} className={styles.card + " p-6 group relative"}>
+                <div className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                   <AiOutlineDelete size={20} className="text-neutral-400 hover:text-red-500 cursor-pointer" onClick={() => setQuestions(questions.filter(item => item._id !== q._id))} />
                 </div>
-              ))}
-            </dl>
-            <br />
-            <br />
-            <IoMdAddCircleOutline
-              className="dark:text-white text-black text-[25px] cursor-pointer"
-              onClick={newFaqHandler}
-            />
+                <div className="mb-4 pr-8">
+                  <label className={styles.badge}>Câu hỏi</label>
+                  <input className="w-full bg-transparent border-b border-black/10 dark:border-white/10 py-2 text-lg font-Josefin font-semibold text-black dark:text-white outline-none focus:border-blue-500 transition-colors" value={q.question} onChange={(e) => setQuestions(questions.map(i => i._id === q._id ? { ...i, question: e.target.value } : i))} placeholder="Nhập câu hỏi..." />
+                </div>
+                <div>
+                  <label className={styles.badge}>Câu trả lời</label>
+                  <textarea rows={3} className="w-full bg-transparent border border-black/10 dark:border-white/10 rounded-md p-3 text-sm text-neutral-600 dark:text-neutral-400 outline-none focus:border-blue-500 transition-colors mt-2 resize-none" value={q.answer} onChange={(e) => setQuestions(questions.map(i => i._id === q._id ? { ...i, answer: e.target.value } : i))} placeholder="Nhập câu trả lời..." />
+                </div>
+              </div>
+            ))}
           </div>
-          <div
-            className={`${
-              areQuestionsUnchanged(data?.layout?.faq || [], questions) ||
-              isAnyQuestionEmpty(questions)
-                ? "cursor-not-allowed bg-gray-500"
-                : "cursor-pointer bg-[#42d383]"
-            } w-[150px] min-h-[40px] h-[40px] text-white rounded flex items-center justify-center font-Poppins mt-10`}
-            onClick={
-              areQuestionsUnchanged(data?.layout?.faq || [], questions) ||
-              isAnyQuestionEmpty(questions)
-                ? () => null
-                : handleEdit
-            }
-          >
-            Save
-          </div>
+
+          <button className="text-blue-500 hover:text-blue-400 font-medium flex items-center gap-2 mb-10" onClick={() => setQuestions([...questions, { _id: Date.now().toString(), question: "", answer: "" }])}>
+            <IoMdAddCircleOutline size={22} /> Thêm câu hỏi
+          </button>
+
+          <button
+            className={`${styles.button} !w-40 ${JSON.stringify(data?.layout?.faq || []) === JSON.stringify(questions) || questions.some(q => q.question === "" || q.answer === "") ? "opacity-50 cursor-not-allowed" : ""}`}
+            onClick={handleEdit}
+          >Lưu thay đổi</button>
         </div>
       )}
     </>

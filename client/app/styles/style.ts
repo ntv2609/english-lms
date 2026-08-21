@@ -1,6 +1,17 @@
 export const styles = {
-    title: "text-[25px] text-black dark:text-white font-[500] font-Poppins text-center py-2",
-    label: "text-[16px] font-Poppins text-black dark:text-white",
-    input: "w-full text-black dark:text-white bg-transparent border rounded h-[40px] px-2 outline-none mt-[10px] font-Poppins",
-    button: "flex flex-row justify-center items-center py-3 px-6 rounded-full cursor-pointer bg-[#2190ff] min-h-[45px] w-full text-[16px] font-Poppins font-semibold text-white",
+  // SaaS Typography
+  title: "text-3xl md:text-5xl lg:text-6xl font-Josefin font-bold tracking-tighter text-black dark:text-white leading-tight",
+  label: "text-xs font-bold tracking-widest text-neutral-500 uppercase block mb-2 font-mono",
+  
+  // Sleek Inputs (Bottom border only, transparent background)
+  input: "w-full bg-transparent border-b border-black/10 dark:border-white/10 py-3 text-black dark:text-white focus:border-blue-500 outline-none transition-colors font-Poppins text-sm",
+  
+  // Brutalist / Elegant Solid Buttons
+  button: "inline-flex items-center justify-center w-full px-6 py-3 text-xs font-bold tracking-widest text-white uppercase transition-all duration-300 bg-black dark:bg-white dark:text-black hover:bg-blue-600 dark:hover:bg-blue-500 hover:text-white rounded-md",
+  
+  // Tags / Micro labels
+  badge: "text-[10px] font-bold tracking-widest uppercase text-neutral-500 dark:text-neutral-400 font-mono",
+  
+  // High contrast thin-border cards
+  card: "bg-white dark:bg-[#0A0A0A] border border-black/5 dark:border-white/5 rounded-2xl transition-all duration-300",
 };

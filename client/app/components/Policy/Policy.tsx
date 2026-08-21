@@ -3,26 +3,20 @@ import { styles } from "@/app/styles/style";
 
 const Policy = () => {
   return (
-    <div className="w-[90%] 800px:w-[80%] m-auto min-h-[70vh] py-12">
-      <h1 className={`${styles.title} 800px:text-[40px] text-center`}>
-        Chính sách bảo mật và Điều khoản sử dụng
+    <div className="max-w-3xl m-auto min-h-[70vh] py-24 px-6 md:px-0">
+      <h1 className={`${styles.title} md:text-[56px] text-left mb-12`}>
+        Chính sách bảo mật <span className="block text-neutral-400 font-light text-2xl mt-4">Cập nhật: T8/2026</span>
       </h1>
-      <br />
-      <div className="w-full text-black dark:text-white font-Poppins text-[18px] leading-8">
-        <h3 className="font-bold text-[22px] mb-2">1. Thu thập thông tin</h3>
-        <p className="mb-4">
-          Chúng tôi chỉ thu thập các thông tin cá nhân cần thiết như email, tên và thông tin liên hệ cơ bản khi bạn đăng ký tài khoản. Mọi thông tin đều được mã hóa an toàn và cam kết không chia sẻ cho bên thứ 3 dưới bất kỳ hình thức nào.
-        </p>
+      
+      <div className="prose prose-lg dark:prose-invert prose-headings:font-Josefin prose-headings:font-bold prose-p:font-light prose-p:leading-relaxed max-w-none">
+        <h3>1. Thu thập thông tin</h3>
+        <p>Chúng tôi đề cao sự tối giản không chỉ trong thiết kế mà cả trong việc thu thập dữ liệu. EngGo chỉ lưu trữ email, tên hiển thị và lịch sử học tập của bạn. Mọi dữ liệu được mã hóa chuẩn AES-256 và tuyệt đối không bao giờ được chia sẻ hay thương mại hóa dưới bất kỳ hình thức nào.</p>
         
-        <h3 className="font-bold text-[22px] mb-2">2. Điều khoản thanh toán</h3>
-        <p className="mb-4">
-          Tất cả các giao dịch thanh toán trên nền tảng đều tuân thủ các quy định bảo mật hiện hành. Sau khi thanh toán thành công, khóa học sẽ tự động được mở khóa trên tài khoản của bạn.
-        </p>
+        <h3>2. Giao dịch & Thanh toán</h3>
+        <p>MoMo là cổng thanh toán duy nhất được tích hợp, đảm bảo an toàn tài chính tuyệt đối theo tiêu chuẩn PCI DSS. Sau khi xác thực webhook thành công, khóa học của bạn sẽ kích hoạt trong mili-giây. Mọi tranh chấp giao dịch sẽ được giải quyết qua email hỗ trợ trong 24h.</p>
         
-        <h3 className="font-bold text-[22px] mb-2">3. Quyền sở hữu trí tuệ</h3>
-        <p className="mb-4">
-          Toàn bộ tài liệu, video bài giảng, giáo trình và file luyện nghe đính kèm trên EngGo đều thuộc quyền sở hữu trí tuệ của nền tảng. Nghiêm cấm mọi hành vi phát tán, sao chép hoặc phân phối lại vì mục đích thương mại khi chưa có sự đồng ý.
-        </p>
+        <h3>3. Bản quyền & Sở hữu trí tuệ</h3>
+        <p>Nội dung trên nền tảng là tài sản trí tuệ độc quyền của EngGo. Chúng tôi áp dụng DRM (Digital Rights Management) qua VdoCipher để bảo vệ video bài giảng. Mọi hành vi phân phối lại mã nguồn hoặc video mà không có văn bản ủy quyền sẽ bị khóa tài khoản vĩnh viễn.</p>
       </div>
     </div>
   );

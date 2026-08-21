@@ -2,142 +2,64 @@ import React, { FC, useEffect, useState } from "react";
 import UserAnalytics from "../Analytics/UserAnalytics";
 import OrderAnalytics from "../Analytics/OrderAnalytics";
 import AllInvoices from "../Order/AllInvoices";
-import { Box, CircularProgress } from "@mui/material";
 import { PiUsersFourLight } from "react-icons/pi";
 import { BiBorderLeft } from "react-icons/bi";
 import { useGetOrdersAnalyticsQuery, useGetUsersAnalyticsQuery } from "@/redux/features/analytics/analyticsApi";
+import { styles } from "@/app/styles/style";
 
-interface CircularProgressProps {
-  value: number;
-  open?: boolean;
-}
-
-const CircularProgressWithLabel: FC<CircularProgressProps> = ({ open, value }) => {
-  return (
-    <Box sx={{ position: "relative", display: "inline-flex" }}>
-      <CircularProgress
-        variant="determinate"
-        value={value}
-        size={45}
-        color={value && value > 99 ? "info" : "error"}
-        thickness={4}
-        style={{ zIndex: open ? -1 : 1 }}
-      />
-      <Box
-        sx={{
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          position: "absolute",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      ></Box>
-    </Box>
-  );
-};
-
-interface Props {
-  open?: boolean;
-}
+interface Props { open?: boolean; }
 
 const DashboardWidgets: FC<Props> = ({ open }) => {
-  const { data: usersData, isLoading: usersLoading } = useGetUsersAnalyticsQuery({});
-  const { data: ordersData, isLoading: ordersLoading } = useGetOrdersAnalyticsQuery({});
-
-  const [userComparePercentage, setUserComparePercentage] = useState<any>();
-  const [orderComparePercentage, setOrderComparePercentage] = useState<any>();
+  const { data: usersData } = useGetUsersAnalyticsQuery({});
+  const { data: ordersData } = useGetOrdersAnalyticsQuery({});
+  const [userStat, setUserStat] = useState<any>({ current: 0, change: 0 });
+  const [orderStat, setOrderStat] = useState<any>({ current: 0, change: 0 });
 
   useEffect(() => {
-    if (usersLoading || ordersLoading) return;
-
-    if (usersData && usersData.users.last12Months.length >= 2) {
-      const usersLastTwoMonths = usersData.users.last12Months.slice(-2);
-      const currentMonth = usersLastTwoMonths[1].count;
-      const previousMonth = usersLastTwoMonths[0].count;
-      const percentChange = previousMonth !== 0 ? ((currentMonth - previousMonth) / previousMonth) * 100 : 100;
-      setUserComparePercentage({
-        currentMonth,
-        previousMonth,
-        percentChange,
-      });
+    if (usersData?.users?.last12Months?.length >= 2) {
+      const arr = usersData.users.last12Months.slice(-2);
+      const prev = arr[0].count; const curr = arr[1].count;
+      setUserStat({ current: curr, change: prev !== 0 ? ((curr - prev) / prev) * 100 : 100 });
     }
-
-    if (ordersData && ordersData.orders.last12Months.length >= 2) {
-      const ordersLastTwoMonths = ordersData.orders.last12Months.slice(-2);
-      const currentMonth = ordersLastTwoMonths[1].count;
-      const previousMonth = ordersLastTwoMonths[0].count;
-      const percentChange = previousMonth !== 0 ? ((currentMonth - previousMonth) / previousMonth) * 100 : 100;
-      setOrderComparePercentage({
-        currentMonth,
-        previousMonth,
-        percentChange,
-      });
+    if (ordersData?.orders?.last12Months?.length >= 2) {
+      const arr = ordersData.orders.last12Months.slice(-2);
+      const prev = arr[0].count; const curr = arr[1].count;
+      setOrderStat({ current: curr, change: prev !== 0 ? ((curr - prev) / prev) * 100 : 100 });
     }
-  }, [usersData, ordersData, usersLoading, ordersLoading]);
+  }, [usersData, ordersData]);
+
+  const MetricCard = ({ title, value, change, icon: Icon, color }: any) => (
+    <div className={`${styles.card} p-6 flex items-center justify-between`}>
+      <div>
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${color}`}>
+          <Icon size={24} className="text-white" />
+        </div>
+        <h3 className={styles.badge}>{title}</h3>
+        <p className="text-3xl font-Josefin font-bold text-black dark:text-white mt-1">{value}</p>
+      </div>
+      <div className="flex flex-col items-end justify-between h-full">
+        <span className={`text-sm font-bold px-2 py-1 rounded ${change >= 0 ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"}`}>
+          {change >= 0 ? '+' : ''}{change.toFixed(1)}%
+        </span>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="mt-[30px] min-h-screen">
-      <div className="grid grid-cols-[75%,25%]">
-        <div className="p-8">
-          <UserAnalytics isDashboard={true} />
-        </div>
-        <div className="pt-[80px] pr-8">
-          {/* Box 1: Sales Obtained */}
-          <div className="w-full dark:bg-[#111C43] rounded-[5px] shadow">
-            <div className="flex items-center p-5 justify-between">
-              <div className="">
-                <BiBorderLeft className="dark:text-[#45CBA0] text-[#000] text-[30px]" />
-                <h5 className="pt-2 font-Poppins dark:text-[#fff] text-black text-[20px]">
-                  {orderComparePercentage?.currentMonth || 0}
-                </h5>
-                <h5 className="py-2 font-Poppins dark:text-[#45CBA0] text-black text-[20px] font-[400]">
-                  Sales Obtained
-                </h5>
-              </div>
-              <div>
-                <CircularProgressWithLabel value={orderComparePercentage?.percentChange > 0 ? 100 : 0} open={open} />
-                <h5 className="text-center pt-4 dark:text-[#fff] text-black">
-                  {orderComparePercentage?.percentChange > 0 ? "+" + orderComparePercentage?.percentChange.toFixed(2) : orderComparePercentage?.percentChange.toFixed(2)}%
-                </h5>
-              </div>
-            </div>
-          </div>
-
-          {/* Box 2: New Users */}
-          <div className="w-full dark:bg-[#111C43] rounded-[5px] shadow my-8">
-            <div className="flex items-center p-5 justify-between">
-              <div className="">
-                <PiUsersFourLight className="dark:text-[#45CBA0] text-[#000] text-[30px]" />
-                <h5 className="pt-2 font-Poppins dark:text-[#fff] text-black text-[20px]">
-                  {userComparePercentage?.currentMonth || 0}
-                </h5>
-                <h5 className="py-2 font-Poppins dark:text-[#45CBA0] text-black text-[20px] font-[400]">
-                  New Users
-                </h5>
-              </div>
-              <div>
-                <CircularProgressWithLabel value={userComparePercentage?.percentChange > 0 ? 100 : 0} open={open} />
-                <h5 className="text-center pt-4 dark:text-[#fff] text-black">
-                  {userComparePercentage?.percentChange > 0 ? "+" + userComparePercentage?.percentChange.toFixed(2) : userComparePercentage?.percentChange.toFixed(2)}%
-                </h5>
-              </div>
-            </div>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-2">
+          <div className={styles.card + " p-6 h-full"}>
+            <UserAnalytics isDashboard={true} />
           </div>
         </div>
-      </div>
-
-      <div className="grid grid-cols-[65%,35%] mt-[-20px]">
-        <div className="dark:bg-[#111c43] w-[94%] mt-[30px] h-[40vh] shadow-sm m-auto">
-          <OrderAnalytics isDashboard={true} />
+        <div className="flex flex-col gap-6">
+          <MetricCard title="Sales Obtained" value={orderStat.current} change={orderStat.change} icon={BiBorderLeft} color="bg-blue-600" />
+          <MetricCard title="New Users" value={userStat.current} change={userStat.change} icon={PiUsersFourLight} color="bg-emerald-500" />
         </div>
-        <div className="p-5">
-          <h5 className="dark:text-[#fff] text-black text-[20px] font-[400] font-Poppins pb-3">
-            Recent Transactions
-          </h5>
-          <AllInvoices isDashboard={true} />
+        <div className="lg:col-span-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2"><AllInvoices isDashboard={true} /></div>
+          <div className="lg:col-span-1"><OrderAnalytics isDashboard={true} /></div>
         </div>
       </div>
     </div>

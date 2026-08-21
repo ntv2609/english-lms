@@ -9,18 +9,18 @@ interface Props {}
 
 const Page: FC<Props> = (props) => {
   return (
-    <div>
+    <div className="bg-[#FAFAFA] dark:bg-[#0A0A0A] min-h-screen">
       <AdminProtected>
         <Heading
           title="ELearning - Admin"
           description="ELearning is a platform for students to learn and get help from teachers"
           keywords="Programming, MERN, Redux, Machine Learning"
         />
-        <div className="flex h-screen">
-          <div className="1500px:w-[16%] w-1/5">
+        <div className="flex h-screen overflow-hidden">
+          <div className="w-[80px] md:w-[250px] shrink-0 border-r border-black/5 dark:border-white/5">
             <AdminSidebar />
           </div>
-          <div className="w-[85%]">
+          <div className="flex-1 overflow-y-auto relative">
             <DashboardHero isDashboard={true} />
           </div>
         </div>

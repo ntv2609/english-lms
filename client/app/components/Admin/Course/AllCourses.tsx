@@ -1,7 +1,7 @@
 "use client";
 import React, { FC, useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Box, Button, Modal } from "@mui/material";
+import { Box, Modal } from "@mui/material";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useTheme } from "next-themes";
 import { FiEdit2 } from "react-icons/fi";
@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 
 const AllCourses: FC = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const [open, setOpen] = useState(false);
   const [courseId, setCourseId] = useState("");
   const { isLoading, data, refetch } = useGetAllCoursesQuery({}, { refetchOnMountOrArgChange: true });
@@ -22,47 +22,33 @@ const AllCourses: FC = () => {
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
     { field: "title", headerName: "Course Title", flex: 1 },
-    { field: "ratings", headerName: "Ratings", flex: 0.5 },
-    { field: "purchased", headerName: "Purchased", flex: 0.5 },
+    { field: "ratings", headerName: "Ratings", flex: 0.3 },
+    { field: "purchased", headerName: "Purchased", flex: 0.3 },
     { field: "created_at", headerName: "Created At", flex: 0.5 },
     {
       field: "edit",
       headerName: "Edit",
       flex: 0.2,
-      renderCell: (params: any) => {
-        return (
-          <>
-            <Link href={`/admin/edit-course/${params.row.id}`}>
-              <FiEdit2 className="dark:text-white text-black" size={20} />
-            </Link>
-          </>
-        );
-      },
+      renderCell: (params: any) => (
+        <Link href={`/admin/edit-course/${params.row.id}`} className="flex h-full items-center">
+          <FiEdit2 className="text-blue-500 hover:text-blue-400 transition-colors" size={18} />
+        </Link>
+      ),
     },
     {
       field: "delete",
       headerName: "Delete",
       flex: 0.2,
-      renderCell: (params: any) => {
-        return (
-          <>
-            <Button
-              onClick={() => {
-                setOpen(!open);
-                setCourseId(params.row.id);
-              }}
-            >
-              <AiOutlineDelete className="dark:text-white text-black" size={20} />
-            </Button>
-          </>
-        );
-      },
+      renderCell: (params: any) => (
+        <button className="flex h-full items-center" onClick={() => { setOpen(true); setCourseId(params.row.id); }}>
+          <AiOutlineDelete className="text-red-500 hover:text-red-400 transition-colors" size={20} />
+        </button>
+      ),
     },
   ];
 
   const rows: any = [];
-
-  if (data && data.courses) {
+  if (data?.courses) {
     data.courses.forEach((item: any) => {
       rows.push({
         id: item._id,
@@ -75,113 +61,42 @@ const AllCourses: FC = () => {
   }
 
   useEffect(() => {
-    if (isSuccess) {
-      setOpen(false);
-      refetch();
-      toast.success("Course Deleted Successfully");
-    }
-    if (error) {
-      if ("data" in error) {
-        const errorMessage = error as any;
-        toast.error(errorMessage.data.message);
-      }
-    }
+    if (isSuccess) { setOpen(false); refetch(); toast.success("Course Deleted"); }
+    if (error && "data" in error) toast.error((error as any).data.message);
   }, [isSuccess, error, refetch]);
 
-  const handleDelete = async () => {
-    const id = courseId;
-    await deleteCourse(id.toString());
-  };
-
   return (
-    <div className="mt-[120px]">
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <Box m="20px">
-          <Box
-            m="40px 0 0 0"
-            height="80vh"
-            sx={{
-              "& .MuiDataGrid-root": {
-                border: "none",
-                outline: "none",
-              },
-              "& .css-pqjvzy-MuiSvgIcon-root-MuiSelect-icon": {
-                color: theme === "dark" ? "#fff" : "#000",
-              },
-              "& .MuiDataGrid-sortIcon": {
-                color: theme === "dark" ? "#fff" : "#000",
-              },
-              "& .MuiDataGrid-row": {
-                color: theme === "dark" ? "#fff" : "#000",
-                borderBottom:
-                  theme === "dark"
-                    ? "1px solid #ffffff30!important"
-                    : "1px solid #ccc!important",
-              },
-              "& .MuiTablePagination-root": {
-                color: theme === "dark" ? "#fff" : "#000",
-              },
-              "& .MuiDataGrid-cell": {
-                borderBottom: "none",
-              },
-              "& .name-column--cell": {
-                color: theme === "dark" ? "#fff" : "#000",
-              },
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
-                borderBottom: "none",
-                color: theme === "dark" ? "#fff" : "#000",
-              },
-              "& .MuiDataGrid-virtualScroller": {
-                backgroundColor: theme === "dark" ? "#1F2A40" : "#F2F0F0",
-              },
-              "& .MuiDataGrid-footerContainer": {
-                color: theme === "dark" ? "#fff" : "#000",
-                borderTop: "none",
-                backgroundColor: theme === "dark" ? "#3e4396" : "#A4A9FC",
-              },
-              "& .MuiCheckbox-root": {
-                color: theme === "dark" ? `#b7ebde !important` : `#000 !important`,
-              },
-              "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-                color: `#fff !important`,
-              },
-            }}
-          >
+    <div>
+      <div className="mb-6 flex justify-between items-end">
+        <h1 className={`${styles.title} !text-left !pb-0 !mb-0`}>Quản lý khóa học</h1>
+        <Link href="/admin/create-course" className={`${styles.button} !w-auto !py-2 !px-4 text-xs`}>
+          + Thêm khóa học
+        </Link>
+      </div>
+      {isLoading ? <Loader /> : (
+        <Box m="0" className={styles.card}>
+          <Box height="70vh" sx={{
+            "& .MuiDataGrid-root": { border: "none", fontFamily: "var(--font-Poppins)" },
+            "& .MuiDataGrid-row": { borderBottom: "1px solid rgba(255,255,255,0.05)" },
+            "& .MuiDataGrid-columnHeaders": { borderBottom: "1px solid rgba(255,255,255,0.1)", color: theme === "dark" ? "#a3a3a3" : "#525252", fontSize: "12px", textTransform: "uppercase" },
+            "& .MuiDataGrid-cell": { borderBottom: "none", color: theme === "dark" ? "#e5e5e5" : "#171717", fontSize: "14px" },
+            "& .MuiDataGrid-footerContainer": { borderTop: "1px solid rgba(255,255,255,0.05)" },
+            "& .MuiCheckbox-root": { color: "#3b82f6 !important" },
+          }}>
             <DataGrid checkboxSelection rows={rows} columns={columns} />
           </Box>
-          {open && (
-            <Modal
-              open={open}
-              onClose={() => setOpen(!open)}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-            >
-              <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[450px] bg-white dark:bg-slate-900 rounded-[8px] shadow p-4 outline-none">
-                <h1 className={`${styles.title}`}>
-                  Are you sure you want to delete this course?
-                </h1>
-                <div className="flex w-full items-center justify-between mb-6 mt-4">
-                  <div
-                    className={`${styles.button} !w-[120px] h-[30px] bg-[#57c7a3]`}
-                    onClick={() => setOpen(!open)}
-                  >
-                    Cancel
-                  </div>
-                  <div
-                    className={`${styles.button} !w-[120px] h-[30px] bg-[red]`}
-                    onClick={handleDelete}
-                  >
-                    Delete
-                  </div>
-                </div>
-              </Box>
-            </Modal>
-          )}
         </Box>
       )}
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-xl shadow-2xl p-8 outline-none">
+          <h2 className="text-xl font-Josefin font-bold text-black dark:text-white mb-2">Xác nhận xóa?</h2>
+          <p className="text-sm text-neutral-500 mb-8">Hành động này không thể hoàn tác. Khóa học sẽ bị xóa vĩnh viễn khỏi hệ thống.</p>
+          <div className="flex justify-end gap-3">
+            <button className="px-4 py-2 text-sm font-medium text-black dark:text-white border border-black/10 dark:border-white/10 rounded-md hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onClick={() => setOpen(false)}>Hủy</button>
+            <button className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors" onClick={() => deleteCourse(courseId)}>Xóa vĩnh viễn</button>
+          </div>
+        </Box>
+      </Modal>
     </div>
   );
 };

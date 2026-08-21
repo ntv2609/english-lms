@@ -7,23 +7,12 @@ import Footer from "../components/Footer";
 
 const Page = () => {
   const [open, setOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState(3);
   const [route, setRoute] = useState("Login");
 
   return (
-    <div className="min-h-screen">
-      <Heading
-        title="Chính sách bảo mật - ELearning"
-        description="Chính sách bảo mật và điều khoản sử dụng của ELearning."
-        keywords="Programming, Policy, Privacy"
-      />
-      <Header
-        open={open}
-        setOpen={setOpen}
-        activeItem={activeItem}
-        setRoute={setRoute}
-        route={route}
-      />
+    <div className="min-h-screen bg-white dark:bg-[#050505]">
+      <Heading title="Chính sách bảo mật - EngGo" description="Chính sách." keywords="Policy" />
+      <Header open={open} setOpen={setOpen} activeItem={3} setRoute={setRoute} route={route} />
       <Policy />
       <Footer />
     </div>

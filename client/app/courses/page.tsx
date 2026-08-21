@@ -8,10 +8,10 @@ import Header from "../components/Header";
 import { Heading } from "../utils/Heading";
 import CourseCard from "../components/Course/CourseCard";
 import Footer from "../components/Footer";
+import { styles } from "../styles/style";
 
 const Page: FC = () => {
-  const searchParams = useSearchParams();
-  const search = searchParams?.get("title");
+  const search = useSearchParams()?.get("title");
   const { data, isLoading } = useGetUsersAllCoursesQuery(undefined, {});
   const { data: categoriesData } = useGetHeroDataQuery("Categories", {});
   const [route, setRoute] = useState("Login");
@@ -20,86 +20,42 @@ const Page: FC = () => {
   const [category, setCategory] = useState("All");
 
   useEffect(() => {
-    if (category === "All") {
-      setCourses(data?.courses);
-    }
-    if (category !== "All") {
-      setCourses(
-        data?.courses.filter((item: any) => item.categories === category)
-      );
-    }
-    if (search) {
-      setCourses(
-        data?.courses.filter((item: any) =>
-          item.name.toLowerCase().includes(search.toLowerCase())
-        )
-      );
-    }
+    let arr = data?.courses || [];
+    if (category !== "All") arr = arr.filter((i: any) => i.categories === category);
+    if (search) arr = arr.filter((i: any) => i.name.toLowerCase().includes(search.toLowerCase()));
+    setCourses(arr);
   }, [data, category, search]);
 
-  const categories = categoriesData?.layout?.categories;
-
   return (
-    <div>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <>
-          <Header
-            route={route}
-            setRoute={setRoute}
-            open={open}
-            setOpen={setOpen}
-            activeItem={1}
-          />
-          <Heading
-            title={"Khóa học - ELearning"}
-            description={"Khám phá các khóa học lập trình chất lượng cao"}
-            keywords={"Programming, MERN, Redux, Machine Learning"}
-          />
-          <br />
-          <div className="w-[95%] 800px:w-[85%] m-auto min-h-[70vh]">
-            <div className="w-full flex items-center flex-wrap pt-5 mb-5">
-              <div
-                className={`h-[35px] ${
-                  category === "All" ? "bg-[crimson]" : "bg-[#5050cb]"
-                } m-3 px-3 rounded-[30px] flex items-center justify-center font-Poppins cursor-pointer`}
-                onClick={() => setCategory("All")}
-              >
-                <span className="text-white">All</span>
-              </div>
-              {categories &&
-                categories.map((item: any, index: number) => (
-                  <div
-                    key={index}
-                    className={`h-[35px] ${
-                      category === item.title ? "bg-[crimson]" : "bg-[#5050cb]"
-                    } m-3 px-3 rounded-[30px] flex items-center justify-center font-Poppins cursor-pointer`}
-                    onClick={() => setCategory(item.title)}
-                  >
-                    <span className="text-white">{item.title}</span>
-                  </div>
-                ))}
-            </div>
-            {courses && courses.length === 0 && (
-              <p className="text-center min-h-[50vh] flex items-center justify-center font-Poppins text-[20px] dark:text-white text-black">
-                {search
-                  ? "Không tìm thấy khóa học nào phù hợp với tìm kiếm của bạn!"
-                  : "Không tìm thấy khóa học nào trong danh mục này!"}
-              </p>
-            )}
-            <br />
-            <br />
-            <div className="grid grid-cols-1 gap-[20px] md:grid-cols-2 md:gap-[25px] lg:grid-cols-3 lg:gap-[25px] 1500px:grid-cols-4 1500px:gap-[35px] mb-12 border-0">
-              {courses &&
-                courses.map((item: any, index: number) => (
-                  <CourseCard item={item} key={index} />
-                ))}
-            </div>
+    <div className="bg-white dark:bg-[#050505] min-h-screen">
+      <Heading title="Danh mục khóa học - EngGo" description="Các khóa học tiếng Anh chuẩn quốc tế." keywords="IELTS, TOEIC, Giao tiếp" />
+      <Header route={route} setRoute={setRoute} open={open} setOpen={setOpen} activeItem={1} />
+      
+      {isLoading ? <Loader /> : (
+        <div className="max-w-[1400px] mx-auto px-6 py-12 md:py-24">
+          <h1 className={`${styles.title} !text-left md:!text-[56px] leading-tight mb-8`}>
+            Khám phá <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-emerald-400">Không giới hạn.</span>
+          </h1>
+
+          <div className="flex flex-wrap gap-3 mb-12">
+            <button onClick={() => setCategory("All")} className={`px-5 py-2 rounded-full text-sm font-bold tracking-widest uppercase transition-all ${category === "All" ? "bg-black text-white dark:bg-white dark:text-black" : "border border-black/10 dark:border-white/10 text-neutral-500 hover:border-black dark:hover:border-white"}`}>Tất cả</button>
+            {categoriesData?.layout?.categories?.map((item: any, idx: number) => (
+              <button key={idx} onClick={() => setCategory(item.title)} className={`px-5 py-2 rounded-full text-sm font-bold tracking-widest uppercase transition-all ${category === item.title ? "bg-black text-white dark:bg-white dark:text-black" : "border border-black/10 dark:border-white/10 text-neutral-500 hover:border-black dark:hover:border-white"}`}>{item.title}</button>
+            ))}
           </div>
-          <Footer />
-        </>
+
+          {courses.length === 0 ? (
+             <div className="py-32 text-center border border-dashed border-black/10 dark:border-white/10 rounded-2xl">
+               <p className="text-xl font-Josefin font-medium text-neutral-500">Không tìm thấy khóa học nào phù hợp.</p>
+             </div>
+          ) : (
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {courses.map((item: any, i: number) => <CourseCard item={item} key={i} />)}
+             </div>
+          )}
+        </div>
       )}
+      <Footer />
     </div>
   );
 };
