@@ -29,10 +29,10 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
   };
 
   return (
-    <div className="max-w-xl">
-      <h1 className="text-3xl font-Josefin font-bold text-black dark:text-white mb-8">Thông tin cá nhân</h1>
+    <div className="max-w-xl w-full">
+      <h1 className="text-2xl sm:text-3xl font-Josefin font-bold text-black dark:text-white mb-8 text-center md:text-left">Thông tin cá nhân</h1>
       
-      <div className="flex items-center gap-8 mb-10">
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8 mb-10 text-center md:text-left">
         <div className="relative group">
           <img src={user?.avatar?.url || avatar || "/assets/avatar.png"} className="w-24 h-24 rounded-full object-cover border border-black/10 dark:border-white/10" alt="avatar" />
           <label htmlFor="avatar" className="absolute inset-0 flex items-center justify-center bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity backdrop-blur-sm">
@@ -40,7 +40,7 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
           </label>
           <input type="file" id="avatar" className="hidden" accept="image/*" onChange={imageHandler} />
         </div>
-        <div>
+        <div className="mt-2 md:mt-0">
           <h3 className="font-Josefin font-bold text-xl dark:text-white">{user?.name}</h3>
           <p className="text-sm font-mono text-neutral-500">{user?.role?.toUpperCase()}</p>
         </div>
@@ -55,7 +55,7 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
           <label className={styles.label}>Email (Định danh)</label>
           <input type="text" readOnly className={styles.input + " bg-black/5 dark:bg-white/5 opacity-70 cursor-not-allowed"} value={user?.email} />
         </div>
-        <button type="submit" className={`${styles.button} !w-40 mt-4`}>Lưu hồ sơ</button>
+        <button type="submit" className={`${styles.button} !w-full md:!w-40 mt-4`}>Lưu hồ sơ</button>
       </form>
     </div>
   );

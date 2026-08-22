@@ -27,7 +27,7 @@ const EditFaq: FC = () => {
   return (
     <>
       {isLoading ? <Loader /> : (
-        <div className="max-w-4xl m-auto">
+        <div className="max-w-4xl m-auto px-2 sm:px-0">
           <div className="mb-8">
             <h1 className={`${styles.title} !text-left !pb-1`}>FAQ / Hỏi đáp</h1>
             <p className={styles.label}>Tùy chỉnh nội dung giải đáp thắc mắc cho học viên</p>
@@ -35,13 +35,13 @@ const EditFaq: FC = () => {
 
           <div className="space-y-6 mb-8">
             {questions.map((q: any) => (
-              <div key={q._id} className={styles.card + " p-6 group relative"}>
-                <div className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div key={q._id} className={styles.card + " p-4 sm:p-6 group relative"}>
+                <div className="absolute right-3 sm:right-4 top-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                    <AiOutlineDelete size={20} className="text-neutral-400 hover:text-red-500 cursor-pointer" onClick={() => setQuestions(questions.filter(item => item._id !== q._id))} />
                 </div>
                 <div className="mb-4 pr-8">
                   <label className={styles.badge}>Câu hỏi</label>
-                  <input className="w-full bg-transparent border-b border-black/10 dark:border-white/10 py-2 text-lg font-Josefin font-semibold text-black dark:text-white outline-none focus:border-blue-500 transition-colors" value={q.question} onChange={(e) => setQuestions(questions.map(i => i._id === q._id ? { ...i, question: e.target.value } : i))} placeholder="Nhập câu hỏi..." />
+                  <input className="w-full bg-transparent border-b border-black/10 dark:border-white/10 py-2 text-base sm:text-lg font-Josefin font-semibold text-black dark:text-white outline-none focus:border-blue-500 transition-colors" value={q.question} onChange={(e) => setQuestions(questions.map(i => i._id === q._id ? { ...i, question: e.target.value } : i))} placeholder="Nhập câu hỏi..." />
                 </div>
                 <div>
                   <label className={styles.badge}>Câu trả lời</label>
@@ -56,7 +56,7 @@ const EditFaq: FC = () => {
           </button>
 
           <button
-            className={`${styles.button} !w-40 ${JSON.stringify(data?.layout?.faq || []) === JSON.stringify(questions) || questions.some(q => q.question === "" || q.answer === "") ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`${styles.button} !w-full sm:!w-40 ${JSON.stringify(data?.layout?.faq || []) === JSON.stringify(questions) || questions.some(q => q.question === "" || q.answer === "") ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={handleEdit}
           >Lưu thay đổi</button>
         </div>

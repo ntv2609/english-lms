@@ -21,8 +21,8 @@ const ChangePassword: FC = () => {
   }, [isSuccess, error]);
 
   return (
-    <div className="max-w-xl">
-      <h1 className="text-3xl font-Josefin font-bold text-black dark:text-white mb-8">Bảo mật</h1>
+    <div className="max-w-xl w-full">
+      <h1 className="text-2xl sm:text-3xl font-Josefin font-bold text-black dark:text-white mb-8 text-center md:text-left">Bảo mật</h1>
       <form onSubmit={passwordChangeHandler} className="space-y-6">
         <div>
           <label className={styles.label}>Mật khẩu hiện tại</label>
@@ -36,7 +36,7 @@ const ChangePassword: FC = () => {
           <label className={styles.label}>Xác nhận mật khẩu mới</label>
           <input type="password" required className={styles.input} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
         </div>
-        <button type="submit" className={`${styles.button} !w-40 mt-4`}>Cập nhật</button>
+        <button type="submit" className={`${styles.button} !w-full md:!w-40 mt-4`}>Cập nhật</button>
       </form>
     </div>
   );

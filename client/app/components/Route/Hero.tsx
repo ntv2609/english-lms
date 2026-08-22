@@ -13,50 +13,48 @@ const Hero: FC = () => {
   return (
     <>
       {isLoading ? <Loader /> : (
-        <div className="relative w-full min-h-[90vh] flex items-center bg-white dark:bg-[#050505] overflow-hidden pt-20">
+        <div className="relative w-full min-h-[90vh] flex items-center bg-white dark:bg-[#050505] overflow-hidden pt-10 sm:pt-20">
           
-          {/* Abstract Grid Background */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
           
-          {/* Subtle Glows */}
           <div className="absolute top-1/4 -left-1/4 w-[50vw] h-[50vw] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
           <div className="absolute bottom-1/4 -right-1/4 w-[50vw] h-[50vw] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-          <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 w-full">
+          <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10 w-full py-12 lg:py-0">
             
             {/* Left Content */}
-            <div className="space-y-10 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-black/10 dark:border-white/10 bg-white/50 dark:bg-black/50 backdrop-blur-sm">
+            <div className="space-y-8 sm:space-y-10 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-black/10 dark:border-white/10 bg-white/50 dark:bg-black/50 backdrop-blur-sm mt-4 lg:mt-0">
                 <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] font-bold tracking-widest uppercase text-neutral-600 dark:text-neutral-400">Nền tảng học Tiếng Anh hệ mới</span>
               </div>
               
-              <h1 className="text-5xl md:text-7xl font-Josefin font-bold tracking-tighter text-black dark:text-white leading-[1.1]">
+              <h1 className="text-4xl sm:text-5xl md:text-7xl font-Josefin font-bold tracking-tighter text-black dark:text-white leading-[1.1]">
                 {data?.layout?.banner?.title || "Master English. Unlock the World."}
               </h1>
               
-              <p className="text-lg md:text-xl text-neutral-600 dark:text-neutral-400 font-light leading-relaxed max-w-xl">
+              <p className="text-base sm:text-lg md:text-xl text-neutral-600 dark:text-neutral-400 font-light leading-relaxed max-w-xl">
                 {data?.layout?.banner?.subTitle || "Tinh gọn, thực chiến và mạnh mẽ. Hệ thống được thiết kế triệt tiêu xao nhãng để bạn bứt tốc."}
               </p>
 
               <div className="relative max-w-lg group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
-                <div className="relative flex items-center bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-xl p-2 h-16">
+                <div className="relative flex flex-col sm:flex-row items-center gap-2 sm:gap-0 bg-white dark:bg-[#0A0A0A] sm:border border-black/10 dark:border-white/10 rounded-xl sm:p-2 sm:h-16">
                   <input
                     type="text"
-                    placeholder="Tìm kiếm khoá học IELTS, Giao tiếp..."
+                    placeholder="Tìm kiếm khoá học IELTS..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && search && router.push(`/courses?title=${search}`)}
-                    className="flex-1 bg-transparent border-none outline-none px-4 text-black dark:text-white font-medium"
+                    className="w-full sm:flex-1 bg-white dark:bg-[#0A0A0A] sm:bg-transparent border border-black/10 dark:border-white/10 sm:border-none rounded-xl sm:rounded-none outline-none p-4 text-black dark:text-white font-medium h-14 sm:h-auto"
                   />
-                  <button onClick={() => search && router.push(`/courses?title=${search}`)} className="h-full px-6 bg-black dark:bg-white text-white dark:text-black font-bold text-sm tracking-wider uppercase rounded-lg hover:scale-95 transition-transform">
+                  <button onClick={() => search && router.push(`/courses?title=${search}`)} className="w-full sm:w-auto h-14 sm:h-full px-6 bg-black dark:bg-white text-white dark:text-black font-bold text-sm tracking-wider uppercase rounded-xl sm:rounded-lg sm:hover:scale-95 transition-transform">
                     Tìm kiếm
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center gap-6 pt-4 border-t border-black/5 dark:border-white/5">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 pt-4 border-t border-black/5 dark:border-white/5">
                 <div className="flex -space-x-3">
                   {[1,2,3].map(i => (
                     <img key={i} src={`https://randomuser.me/api/portraits/women/${i+10}.jpg`} className="w-10 h-10 rounded-full border-2 border-white dark:border-[#050505] object-cover" alt="student" />
@@ -74,7 +72,6 @@ const Hero: FC = () => {
               <div className="relative w-full aspect-square flex items-center justify-center">
                  <img src={data?.layout?.banner?.image?.url || "/assets/banner.png"} className="w-[85%] h-[85%] object-contain drop-shadow-2xl z-10" alt="Hero Illustration" />
                  
-                 {/* Floating Stats Cards */}
                  <div className="absolute top-10 right-10 bg-white/80 dark:bg-black/80 backdrop-blur-md border border-black/5 dark:border-white/5 p-4 rounded-2xl shadow-xl z-20 animate-bounce" style={{animationDuration: '4s'}}>
                    <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-1">Mức độ hài lòng</p>
                    <p className="text-2xl font-Josefin font-bold text-emerald-500">99.8%</p>

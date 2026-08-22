@@ -27,7 +27,7 @@ const EditCategories: FC = () => {
   return (
     <>
       {isLoading ? <Loader /> : (
-        <div className="max-w-3xl m-auto">
+        <div className="max-w-3xl m-auto px-2 sm:px-0">
           <div className="mb-8">
             <h1 className={`${styles.title} !text-left !pb-1`}>Danh mục khóa học</h1>
             <p className={styles.label}>Quản lý các thẻ phân loại hiển thị trên trang chủ</p>
@@ -37,12 +37,12 @@ const EditCategories: FC = () => {
             {categories.map((item: any) => (
               <div className={styles.card + " p-4 flex items-center gap-4 group"} key={item._id}>
                 <input
-                  className="flex-1 bg-transparent text-lg font-Josefin font-medium text-black dark:text-white outline-none"
+                  className="flex-1 bg-transparent text-base sm:text-lg font-Josefin font-medium text-black dark:text-white outline-none w-full"
                   value={item.title}
                   onChange={(e) => setCategories(categories.map(i => i._id === item._id ? { ...i, title: e.target.value } : i))}
                   placeholder="Nhập tên danh mục..."
                 />
-                <AiOutlineDelete className="text-neutral-300 hover:text-red-500 cursor-pointer opacity-0 group-hover:opacity-100 transition-all" size={24} onClick={() => setCategories(categories.filter(i => i._id !== item._id))} />
+                <AiOutlineDelete className="text-neutral-400 sm:text-neutral-300 hover:text-red-500 cursor-pointer opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all shrink-0" size={24} onClick={() => setCategories(categories.filter(i => i._id !== item._id))} />
               </div>
             ))}
           </div>
@@ -52,7 +52,7 @@ const EditCategories: FC = () => {
           </button>
 
           <button
-            className={`${styles.button} !w-40 ${JSON.stringify(data?.layout?.categories || []) === JSON.stringify(categories) || categories.some(q => q.title === "") ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`${styles.button} !w-full sm:!w-40 ${JSON.stringify(data?.layout?.categories || []) === JSON.stringify(categories) || categories.some(q => q.title === "") ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={editCategoriesHandler}
           >Lưu thay đổi</button>
         </div>

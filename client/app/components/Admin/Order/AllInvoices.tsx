@@ -14,33 +14,49 @@ interface Props { isDashboard?: boolean; }
 
 const AllInvoices: FC<Props> = ({ isDashboard }) => {
   const { theme } = useTheme();
-  const { isLoading, data } = useGetAllOrdersQuery({});
-  const { data: usersData } = useGetAllUsersQuery({});
-  const { data: coursesData } = useGetAllCoursesQuery({});
+  // FIX LỖI CACHE: Thêm refetchOnMountOrArgChange: true để ép RTK Query luôn lấy data mới nhất
+  const { isLoading, data } = useGetAllOrdersQuery({}, { refetchOnMountOrArgChange: true });
+  const { data: usersData } = useGetAllUsersQuery({}, { refetchOnMountOrArgChange: true });
+  const { data: coursesData } = useGetAllCoursesQuery({}, { refetchOnMountOrArgChange: true });
   const [orderData, setOrderData] = useState<any>([]);
 
   useEffect(() => {
     if (data && usersData && coursesData) {
       const temp = data.orders.map((item: any) => {
-        const user = usersData?.users.find((u: any) => u._id === item.userId);
-        const course = coursesData?.courses.find((c: any) => c._id === item.courseId);
-        return { ...item, userName: user?.name, userEmail: user?.email, title: course?.name, price: "$" + course?.price };
+        const user = usersData?.users?.find((u: any) => u._id === item.userId);
+        const course = coursesData?.courses?.find((c: any) => c._id === item.courseId);
+        
+        // CƠ CHẾ FALLBACK: Tránh crash bảng khi khóa học hoặc user đã bị xóa
+        return { 
+            ...item, 
+            userName: user?.name || "Người dùng đã xóa", 
+            userEmail: user?.email || "Không xác định", 
+            title: course?.name || "Khóa học đã xóa", 
+            price: course?.price ? `${course.price.toLocaleString('vi-VN')} VNĐ` : "0 VNĐ" 
+        };
       });
       setOrderData(temp);
     }
   }, [data, usersData, coursesData]);
 
   const columns: any = [
-    { field: "id", headerName: "ID", flex: 0.3 },
-    { field: "userName", headerName: "Name", flex: isDashboard ? 0.6 : 0.5 },
-    ...(isDashboard ? [] : [{ field: "userEmail", headerName: "Email", flex: 1 }, { field: "title", headerName: "Course", flex: 1 }]),
-    { field: "price", headerName: "Price", flex: 0.3 },
-    { field: "created_at", headerName: "Date", flex: 0.5 },
+    { field: "id", headerName: "MÃ ĐƠN HÀNG", flex: 0.3 },
+    { field: "userName", headerName: "HỌ TÊN", flex: isDashboard ? 0.6 : 0.5 },
+    ...(isDashboard ? [] : [{ field: "userEmail", headerName: "EMAIL", flex: 1 }, { field: "title", headerName: "TÊN KHÓA HỌC", flex: 1 }]),
+    { field: "price", headerName: "SỐ TIỀN", flex: 0.3 },
+    { field: "created_at", headerName: "THỜI GIAN", flex: 0.5 },
   ];
 
   const rows: any = [];
-  orderData?.forEach((item: any) => {
-    rows.push({ id: item._id, userName: item.userName, userEmail: item.userEmail, title: item.title, price: item.price, created_at: format(item.createdAt) });
+  orderData && orderData.forEach((item: any) => {
+    rows.push({ 
+        id: item._id, 
+        userName: item.userName, 
+        userEmail: item.userEmail, 
+        title: item.title, 
+        price: item.price, 
+        created_at: format(item.createdAt) 
+    });
   });
 
   return (

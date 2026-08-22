@@ -10,7 +10,6 @@ interface Props { setRoute: (route: string) => void; }
 const Verification: FC<Props> = ({ setRoute }) => {
   const { token } = useSelector((state: any) => state.auth);
   const [activation, { isSuccess, error }] = useActivationMutation();
-  // Đổi kiểu key sang string để không bị tranh chấp kiểu dữ liệu khắt khe
   const [verifyNumber, setVerifyNumber] = useState<{ [key: string]: string }>({ 0: "", 1: "", 2: "", 3: "", 4: "", 5: "" });
   const inputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
@@ -37,7 +36,7 @@ const Verification: FC<Props> = ({ setRoute }) => {
         <h1 className="text-2xl font-Josefin font-bold text-black dark:text-white mb-2">Xác thực tài khoản</h1>
         <p className="text-sm text-neutral-500">Nhập mã OTP gồm 6 chữ số được gửi đến email của bạn</p>
       </div>
-      <div className="flex justify-center gap-3 mb-8">
+      <div className="flex justify-center gap-2 sm:gap-3 mb-8">
         {Object.keys(verifyNumber).map((k, i) => (
           <input 
             key={k} 
@@ -46,7 +45,7 @@ const Verification: FC<Props> = ({ setRoute }) => {
             maxLength={1} 
             value={verifyNumber[k]} 
             onChange={(e) => handleInputChange(i, e.target.value)} 
-            className="w-12 h-14 text-center text-xl font-mono font-bold bg-transparent border-2 border-black/10 dark:border-white/10 rounded-lg outline-none focus:border-blue-500 transition-colors text-black dark:text-white" 
+            className="w-10 h-12 sm:w-12 sm:h-14 text-center text-lg sm:text-xl font-mono font-bold bg-transparent border-2 border-black/10 dark:border-white/10 rounded-lg outline-none focus:border-blue-500 transition-colors text-black dark:text-white" 
           />
         ))}
       </div>

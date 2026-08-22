@@ -15,24 +15,24 @@ const SideBarProfile: FC<Props> = ({ user, active, setActive, logOutHandler }) =
   ];
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-row md:flex-col gap-2 overflow-x-auto hide-scrollbar w-full pb-2 md:pb-0">
       {menus.map(m => {
         const Icon = m.icon;
         const isActive = active === m.id;
         return (
-          <button key={m.id} onClick={() => setActive(m.id)} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm ${isActive ? "bg-black text-white dark:bg-white dark:text-black" : "text-neutral-500 hover:bg-black/5 dark:hover:bg-white/5"}`}>
+          <button key={m.id} onClick={() => setActive(m.id)} className={`flex items-center gap-2 md:gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap shrink-0 ${isActive ? "bg-black text-white dark:bg-white dark:text-black" : "text-neutral-500 hover:bg-black/5 dark:hover:bg-white/5"}`}>
             <Icon size={18} /> {m.label}
           </button>
         )
       })}
       
       {user?.role === 'admin' && (
-        <Link href="/admin" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm text-blue-600 dark:text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 mt-4 border border-blue-500/20">
+        <Link href="/admin" className="flex items-center gap-2 md:gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap shrink-0 text-blue-600 dark:text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 mt-0 md:mt-4 border border-blue-500/20">
           <RiDashboardLine size={18} /> Admin Dashboard
         </Link>
       )}
 
-      <button onClick={logOutHandler} className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm text-red-500 hover:bg-red-500/10 mt-4">
+      <button onClick={logOutHandler} className="flex items-center gap-2 md:gap-3 px-4 py-3 rounded-xl transition-all font-medium text-sm whitespace-nowrap shrink-0 text-red-500 hover:bg-red-500/10 mt-0 md:mt-4">
         <AiOutlineLogout size={18} /> Đăng xuất
       </button>
     </div>

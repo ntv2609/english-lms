@@ -29,7 +29,7 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
   return (
     <div className="w-full max-w-4xl mx-auto mt-10">
       <form onSubmit={(e) => { e.preventDefault(); setActive(active + 1); }} className="space-y-6">
-        <div className={styles.card + " p-8 space-y-6"}>
+        <div className={styles.card + " p-5 md:p-8 space-y-6"}>
           <div>
             <label className={styles.label}>Tên khóa học</label>
             <input type="text" required className={styles.input} value={courseInfo.name} onChange={(e) => setCourseInfo({ ...courseInfo, name: e.target.value })} placeholder="Ví dụ: Tiếng Anh Giao Tiếp Cho Người Đi Làm" />
@@ -38,7 +38,7 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
             <label className={styles.label}>Mô tả chi tiết</label>
             <textarea required rows={6} className={styles.input + " !h-auto py-3 resize-none"} value={courseInfo.description} onChange={(e) => setCourseInfo({ ...courseInfo, description: e.target.value })} placeholder="Cung cấp cái nhìn tổng quan về nội dung khóa học..." />
           </div>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className={styles.label}>Giá bán (VNĐ)</label>
               <input type="number" required className={styles.input} value={courseInfo.price} onChange={(e) => setCourseInfo({ ...courseInfo, price: e.target.value })} />
@@ -48,7 +48,7 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
               <input type="number" className={styles.input} value={courseInfo.estimatedPrice} onChange={(e) => setCourseInfo({ ...courseInfo, estimatedPrice: e.target.value })} />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className={styles.label}>Tags (Cách nhau dấu phẩy)</label>
               <input type="text" required className={styles.input} value={courseInfo.tags} onChange={(e) => setCourseInfo({ ...courseInfo, tags: e.target.value })} placeholder="IELTS, Giao tiếp, Basic..." />
@@ -61,7 +61,7 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
               </select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className={styles.label}>Trình độ</label>
               <input type="text" required className={styles.input} value={courseInfo.level} onChange={(e) => setCourseInfo({ ...courseInfo, level: e.target.value })} placeholder="Beginner / Intermediate / Advanced" />
@@ -86,7 +86,7 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
               ) : (
                 <div className="flex flex-col items-center justify-center pt-5 pb-6 text-neutral-500">
                   <AiOutlineCloudUpload size={40} className="mb-3" />
-                  <p className="mb-2 text-sm"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                  <p className="mb-2 text-sm text-center px-4"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                   <p className="text-xs">PNG, JPG or WEBP (Max. 800x400px)</p>
                 </div>
               )}
@@ -94,7 +94,7 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
           </div>
         </div>
         <div className="flex justify-end">
-          <input type="submit" value="Next Step" className={`${styles.button} !w-40`} />
+          <input type="submit" value="Next Step" className={`${styles.button} !w-full md:!w-40`} />
         </div>
       </form>
     </div>

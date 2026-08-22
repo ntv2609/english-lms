@@ -14,18 +14,17 @@ interface Props {
 
 const CourseData: FC<Props> = ({ benefits, setBenefits, prerequisites, setPrerequisites, active, setActive }) => {
   return (
-    <div className="w-full max-w-4xl mx-auto mt-10 space-y-12">
-      <div className={styles.card + " p-8"}>
+    <div className="w-full max-w-4xl mx-auto mt-10 space-y-12 px-2 sm:px-0">
+      <div className={styles.card + " p-5 md:p-8"}>
         <h2 className="text-xl font-Josefin font-bold text-black dark:text-white mb-6">Lợi ích khóa học</h2>
         <div className="space-y-4">
           {benefits.map((benefit, index) => (
-            <div key={index} className="flex items-center gap-3">
+            <div key={index} className="flex items-start sm:items-center gap-3">
               <input 
                 type="text" 
-                className={styles.input + " !mt-0"} 
+                className={styles.input + " !mt-0 flex-1"} 
                 value={benefit.title} 
                 onChange={(e) => { 
-                  // KIẾN TRÚC MỚI: Immutable Update
                   const arr = [...benefits]; 
                   arr[index] = { ...arr[index], title: e.target.value }; 
                   setBenefits(arr); 
@@ -34,7 +33,7 @@ const CourseData: FC<Props> = ({ benefits, setBenefits, prerequisites, setPrereq
               />
               <AiOutlineDelete 
                 size={24} 
-                className="text-neutral-400 hover:text-red-500 cursor-pointer shrink-0" 
+                className="text-neutral-400 hover:text-red-500 cursor-pointer shrink-0 mt-3 sm:mt-0" 
                 onClick={() => { 
                   if(benefits.length > 1) { 
                     const arr = benefits.filter((_, i) => i !== index); 
@@ -50,17 +49,16 @@ const CourseData: FC<Props> = ({ benefits, setBenefits, prerequisites, setPrereq
         </div>
       </div>
 
-      <div className={styles.card + " p-8"}>
+      <div className={styles.card + " p-5 md:p-8"}>
         <h2 className="text-xl font-Josefin font-bold text-black dark:text-white mb-6">Yêu cầu đầu vào</h2>
         <div className="space-y-4">
           {prerequisites.map((req, index) => (
-            <div key={index} className="flex items-center gap-3">
+            <div key={index} className="flex items-start sm:items-center gap-3">
               <input 
                 type="text" 
-                className={styles.input + " !mt-0"} 
+                className={styles.input + " !mt-0 flex-1"} 
                 value={req.title} 
                 onChange={(e) => { 
-                  // KIẾN TRÚC MỚI: Immutable Update
                   const arr = [...prerequisites]; 
                   arr[index] = { ...arr[index], title: e.target.value }; 
                   setPrerequisites(arr); 
@@ -69,7 +67,7 @@ const CourseData: FC<Props> = ({ benefits, setBenefits, prerequisites, setPrereq
               />
               <AiOutlineDelete 
                 size={24} 
-                className="text-neutral-400 hover:text-red-500 cursor-pointer shrink-0" 
+                className="text-neutral-400 hover:text-red-500 cursor-pointer shrink-0 mt-3 sm:mt-0" 
                 onClick={() => { 
                   if(prerequisites.length > 1) { 
                     const arr = prerequisites.filter((_, i) => i !== index); 
@@ -85,9 +83,9 @@ const CourseData: FC<Props> = ({ benefits, setBenefits, prerequisites, setPrereq
         </div>
       </div>
 
-      <div className="w-full flex justify-between">
-        <button className={`${styles.button} !w-32 !bg-transparent !text-black dark:!text-white border border-black/20 dark:border-white/20`} onClick={() => setActive(active - 1)}>Back</button>
-        <button className={`${styles.button} !w-32`} onClick={() => {
+      <div className="w-full flex flex-col sm:flex-row justify-between gap-4 mt-8">
+        <button className={`${styles.button} !w-full sm:!w-32 !bg-transparent !text-black dark:!text-white border border-black/20 dark:border-white/20`} onClick={() => setActive(active - 1)}>Back</button>
+        <button className={`${styles.button} !w-full sm:!w-32`} onClick={() => {
           if (benefits[0].title === "" || prerequisites[0].title === "") toast.error("Vui lòng nhập ít nhất 1 mục!");
           else setActive(active + 1);
         }}>Next</button>

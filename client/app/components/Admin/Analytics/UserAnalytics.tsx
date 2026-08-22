@@ -31,8 +31,8 @@ const UserAnalytics: FC<Props> = ({ isDashboard }) => {
               <p className={styles.label}>Tăng trưởng người dùng 12 tháng qua</p>
             </div>
           )}
-          <div className={`${!isDashboard ? styles.card : ''} w-full ${!isDashboard ? 'h-[60vh] p-6' : 'h-full'} flex flex-col justify-center`}>
-            {isDashboard && <h2 className="text-lg font-Josefin font-bold text-black dark:text-white mb-4 px-2">Tăng trưởng User</h2>}
+          <div className={`${!isDashboard ? styles.card : ''} w-full ${!isDashboard ? 'h-[40vh] sm:h-[60vh] p-2 sm:p-6' : 'h-[30vh] sm:h-full'} flex flex-col justify-center`}>
+            {isDashboard && <h2 className="text-base sm:text-lg font-Josefin font-bold text-black dark:text-white mb-4 px-2">Tăng trưởng User</h2>}
             <ResponsiveContainer width="100%" height={isDashboard ? "80%" : "100%"}>
               <AreaChart data={analyticsData} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
                 <defs>
@@ -41,8 +41,8 @@ const UserAnalytics: FC<Props> = ({ isDashboard }) => {
                     <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="name" tick={{fill: '#888888', fontSize: 12}} axisLine={false} tickLine={false} />
-                <YAxis tick={{fill: '#888888', fontSize: 12}} axisLine={false} tickLine={false} />
+                <XAxis dataKey="name" tick={{fill: '#888888', fontSize: 10}} axisLine={false} tickLine={false} />
+                <YAxis tick={{fill: '#888888', fontSize: 10}} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px', color: '#fff'}} />
                 <Area type="monotone" dataKey="count" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" />
               </AreaChart>

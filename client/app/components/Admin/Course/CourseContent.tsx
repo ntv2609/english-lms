@@ -74,7 +74,6 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
       toast.success("Đã xóa bộ câu hỏi trắc nghiệm.");
   };
 
-  // KIẾN TRÚC MỚI: Bổ sung logic NEXT chuyển trang an toàn
   const handleNext = () => {
     const lastItem = courseContentData[courseContentData.length - 1];
     if (
@@ -90,17 +89,17 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-10">
+    <div className="w-full max-w-4xl mx-auto mt-10 px-2 sm:px-0">
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
         {courseContentData.map((item: any, index: number) => {
           const showSectionInput = index === 0 || item.videoSection !== courseContentData[index - 1].videoSection;
           return (
-            <div key={index} className={styles.card + " p-6"}>
+            <div key={index} className={styles.card + " p-4 sm:p-6"}>
               {showSectionInput && (
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-black/5 dark:border-white/5">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6 pb-4 border-b border-black/5 dark:border-white/5">
                   <input
                     type="text"
-                    className="text-xl font-Josefin font-bold bg-transparent outline-none text-black dark:text-white w-full"
+                    className="text-lg sm:text-xl font-Josefin font-bold bg-transparent outline-none text-black dark:text-white w-full"
                     value={item.videoSection}
                     onChange={(e) => {
                       const arr = [...courseContentData];
@@ -108,15 +107,15 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                       setCourseContentData(arr);
                     }}
                   />
-                  <BsPencil className="text-neutral-500" />
+                  <BsPencil className="text-neutral-500 hidden sm:block" />
                 </div>
               )}
               
-              <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 p-4 rounded-md cursor-pointer" onClick={() => toggle(index)}>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 bg-black/5 dark:bg-white/5 p-4 rounded-md cursor-pointer" onClick={() => toggle(index)}>
                 <p className="font-medium text-black dark:text-white text-sm">
                   {index + 1}. {item.title || "Untitled Video"}
                 </p>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
                   <AiOutlineDelete
                     className={`text-neutral-400 hover:text-red-500 transition-colors ${index === 0 ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
                     onClick={(e) => {
@@ -134,7 +133,7 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
               </div>
 
               {!isCollapsed[index] && (
-                <div className="mt-6 space-y-5 pl-4 border-l-2 border-black/5 dark:border-white/5">
+                <div className="mt-6 space-y-5 pl-2 sm:pl-4 border-l-2 border-black/5 dark:border-white/5">
                   <div>
                     <label className={styles.label}>Video Title</label>
                     <input type="text" className={styles.input} value={item.title} onChange={(e) => { const arr=[...courseContentData]; arr[index]={...arr[index], title: e.target.value}; setCourseContentData(arr); }} />
@@ -148,7 +147,7 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                     <input type="number" className={styles.input} value={item.videoLength} onChange={(e) => { const arr=[...courseContentData]; arr[index]={...arr[index], videoLength: e.target.value}; setCourseContentData(arr); }} />
                   </div>
                   <div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
                       <label className={styles.label}>Description</label>
                       <button 
                         type="button" 
@@ -164,7 +163,7 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
 
                   {item.quizzes && item.quizzes.length > 0 && (
                       <div className="bg-emerald-500/5 border border-emerald-500/20 p-4 rounded-lg">
-                          <div className="flex items-center justify-between mb-3">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-3">
                               <h4 className="text-sm font-bold text-emerald-600 dark:text-emerald-400">✅ {item.quizzes.length} Câu hỏi trắc nghiệm đã được sinh</h4>
                               <button type="button" className="text-xs text-red-500 hover:underline" onClick={() => handleDeleteQuiz(index)}>Xóa bộ đề</button>
                           </div>
@@ -191,7 +190,7 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                     <label className={styles.label}>Bài tập Writing / Đề bài (Tùy chọn)</label>
                     <textarea 
                       rows={3} 
-                      placeholder="Nhập đề bài Writing (Homework) cho học viên tại đây. AI sẽ dùng đề này để chấm điểm..." 
+                      placeholder="Nhập đề bài Writing (Homework) cho học viên tại đây..." 
                       className={styles.input + " !h-auto py-3 resize-none bg-blue-500/5 border-blue-500/20"} 
                       value={item.homework || ""} 
                       onChange={(e) => { const arr=[...courseContentData]; arr[index]={...arr[index], homework: e.target.value}; setCourseContentData(arr); }} 
@@ -251,9 +250,9 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
           <AiOutlinePlusCircle size={20}/> Create New Section
         </button>
       </form>
-      <div className="w-full flex justify-between mt-10">
-        <button className={`${styles.button} !w-32 !bg-transparent !text-black dark:!text-white border border-black/20 dark:border-white/20`} onClick={() => setActive(active - 1)}>Back</button>
-        <button className={`${styles.button} !w-32`} onClick={handleNext}>Next</button>
+      <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 mt-10">
+        <button className={`${styles.button} !w-full sm:!w-32 !bg-transparent !text-black dark:!text-white border border-black/20 dark:border-white/20`} onClick={() => setActive(active - 1)}>Back</button>
+        <button className={`${styles.button} !w-full sm:!w-32`} onClick={handleNext}>Next</button>
       </div>
     </div>
   );

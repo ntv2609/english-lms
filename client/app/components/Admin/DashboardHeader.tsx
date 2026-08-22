@@ -26,8 +26,7 @@ const DashboardHeader: FC<Props> = ({ open, setOpen }) => {
   }, [refetch]);
 
   return (
-    /* ĐÃ SỬA: Đổi fixed thành sticky top-0, xóa right-0 */
-    <div className="w-full flex items-center justify-end px-8 py-4 sticky top-0 z-[99] bg-white/90 dark:bg-[#0A0A0A]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 h-[80px]">
+    <div className="w-full flex items-center justify-end px-4 md:px-8 py-4 sticky top-0 z-[99] bg-white/90 dark:bg-[#0A0A0A]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 h-[80px]">
       <div className="flex items-center gap-4">
         <ThemeSwitcher />
         <div className="relative cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors" onClick={() => setOpen(!open)}>
@@ -39,7 +38,7 @@ const DashboardHeader: FC<Props> = ({ open, setOpen }) => {
       </div>
 
       {open && (
-        <div className="absolute right-8 top-[90px] w-[350px] max-h-[400px] bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="absolute right-2 sm:right-8 top-[90px] w-[300px] sm:w-[350px] max-h-[400px] bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden flex flex-col">
           <div className="p-4 border-b border-black/5 dark:border-white/5 bg-neutral-50 dark:bg-neutral-900/50">
             <h3 className="font-Josefin font-bold text-sm text-black dark:text-white">Thông báo ({notifications.length})</h3>
           </div>

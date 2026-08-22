@@ -67,16 +67,17 @@ const AllCourses: FC = () => {
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-end">
+      <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
         <h1 className={`${styles.title} !text-left !pb-0 !mb-0`}>Quản lý khóa học</h1>
-        <Link href="/admin/create-course" className={`${styles.button} !w-auto !py-2 !px-4 text-xs`}>
+        <Link href="/admin/create-course" className={`${styles.button} !w-full sm:!w-auto !py-2 !px-4 text-xs`}>
           + Thêm khóa học
         </Link>
       </div>
       {isLoading ? <Loader /> : (
         <Box m="0" className={styles.card}>
           <Box height="70vh" sx={{
-            "& .MuiDataGrid-root": { border: "none", fontFamily: "var(--font-Poppins)" },
+            overflowX: "auto",
+            "& .MuiDataGrid-root": { border: "none", fontFamily: "var(--font-Poppins)", minWidth: "800px" },
             "& .MuiDataGrid-row": { borderBottom: "1px solid rgba(255,255,255,0.05)" },
             "& .MuiDataGrid-columnHeaders": { borderBottom: "1px solid rgba(255,255,255,0.1)", color: theme === "dark" ? "#a3a3a3" : "#525252", fontSize: "12px", textTransform: "uppercase" },
             "& .MuiDataGrid-cell": { borderBottom: "none", color: theme === "dark" ? "#e5e5e5" : "#171717", fontSize: "14px" },
@@ -88,7 +89,7 @@ const AllCourses: FC = () => {
         </Box>
       )}
       <Modal open={open} onClose={() => setOpen(false)}>
-        <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-xl shadow-2xl p-8 outline-none">
+        <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-[400px] bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-xl shadow-2xl p-6 md:p-8 outline-none max-w-full">
           <h2 className="text-xl font-Josefin font-bold text-black dark:text-white mb-2">Xác nhận xóa?</h2>
           <p className="text-sm text-neutral-500 mb-8">Hành động này không thể hoàn tác. Khóa học sẽ bị xóa vĩnh viễn khỏi hệ thống.</p>
           <div className="flex justify-end gap-3">
