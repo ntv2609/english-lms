@@ -69,6 +69,12 @@ export const editCourse = CatchAsyncErrors(async (req: Request, res: Response, n
             { new: true }
         );
 
+        // FIX LỖI CACHE: Cập nhật lại cache chi tiết khóa học và xóa cache danh sách tổng
+        if (course) {
+            await redis.set(courseId.toString(), JSON.stringify(course), "EX", 604800);
+        }
+        await redis.del("allCourses");
+
         res.status(201).json({
             success: true,
             course,
@@ -235,7 +241,6 @@ export const addAnswer = CatchAsyncErrors(async (req: Request, res: Response, ne
             return next(new ErrorHandler("Không tìm thấy câu hỏi", 400));
         }
 
-        // BỔ SUNG FIX TỪ VIDEO: Ép cứng createdAt/updatedAt cho sub-doc của commentReplies
         const newAnswer: any = {
             user: req.user,
             comment: answer,
@@ -319,12 +324,14 @@ export const addReview = CatchAsyncErrors(async (req: Request, res: Response, ne
 
         if (course) {
             course.ratings = avg / course.reviews.length;
+            await course.save();
+            
+            // Cập nhật lại Redis khi khóa học có sự thay đổi
+            await redis.set(courseId.toString(), JSON.stringify(course), "EX", 604800);
         }
 
-        await course?.save();
-
-        // FIX TỪ VIDEO: Cập nhật lại Redis khi khóa học có sự thay đổi
-        await redis.set(courseId.toString(), JSON.stringify(course), "EX", 604800);
+        // BỔ SUNG ĐỂ FIX CACHE: Xóa cache danh sách để cập nhật điểm rating ngoài trang chủ
+        await redis.del("allCourses");
 
         await NotificationModel.create({
             userId: req.user?._id?.toString(),
@@ -364,7 +371,6 @@ export const addReplyToReview = CatchAsyncErrors(async (req: Request, res: Respo
             return next(new ErrorHandler("Không tìm thấy đánh giá", 404));
         }
 
-        // BỔ SUNG FIX TỪ VIDEO: Ép cứng createdAt/updatedAt cho sub-doc
         const replyData: any = {
             user: req.user,
             comment,
@@ -380,7 +386,6 @@ export const addReplyToReview = CatchAsyncErrors(async (req: Request, res: Respo
 
         await course?.save();
 
-        // FIX TỪ VIDEO: Cập nhật lại Redis khi khóa học có sự thay đổi
         await redis.set(courseId.toString(), JSON.stringify(course), "EX", 604800);
 
         res.status(200).json({
@@ -414,7 +419,11 @@ export const deleteCourse = CatchAsyncErrors(async (req: Request, res: Response,
 
         await course.deleteOne({ _id: id });
 
+        // Xóa cache chi tiết của khóa học này
         await redis.del(id.toString());
+        
+        // FIX ROOT CAUSE: Xóa sạch cache của mảng danh sách tổng hợp
+        await redis.del("allCourses");
 
         res.status(200).json({
             success: true,
