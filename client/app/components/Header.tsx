@@ -10,7 +10,7 @@ import SignUp from "./Auth/SignUp";
 import Verification from "./Auth/Verification";
 import { useSelector } from "react-redux";
 import { useSession } from "next-auth/react";
-import { useSocialAuthMutation, useLogoutQuery } from "@/redux/features/auth/authApi";
+import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
 
 interface Props { open: boolean; setOpen: (open: boolean) => void; activeItem: number; route: string; setRoute: (route: string) => void; }
@@ -22,16 +22,12 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const { user } = useSelector((state: any) => state.auth);
   const { data } = useSession();
   const [socialAuth, { isSuccess }] = useSocialAuthMutation();
-  const [logout, setLogout] = useState(false);
-  useLogoutQuery(undefined, { skip: !logout });
-
-  useEffect(() => {
+useEffect(() => {
     setMounted(true); // Chỉ bật sau khi Client đã mount xong
   }, []);
 
   useEffect(() => {
     if (!user && data) socialAuth({ email: data?.user?.email, name: data?.user?.name, avatar: data?.user?.image });
-    if (data === null && isSuccess) setLogout(true);
     if (data !== null && isSuccess) { toast.success("Đăng nhập thành công"); setOpen(false); }
   }, [data, user, isSuccess, socialAuth, setOpen]);
 

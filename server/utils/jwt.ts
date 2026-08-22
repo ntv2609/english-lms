@@ -9,6 +9,7 @@ interface ITokenOptions {
     httpOnly: boolean;
     sameSite: 'lax' | 'strict' | 'none' | undefined;
     secure?: boolean;
+    path?: string;
 }
 
 // Parse environment variables to integrate with fallback values (Sửa lỗi chính tả)
@@ -17,10 +18,11 @@ const refreshTokenExpire = parseInt(process.env.REFRESH_TOKEN_EXPIRE || '3', 10)
 
 // Options for cookies (Đã nhân lại công thức thời gian cho chuẩn)
 export const accessTokenOptions: ITokenOptions = {
-    expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000), // Tính bằng phút
-    maxAge: accessTokenExpire * 60 * 60 * 1000,
+    expires: new Date(Date.now() + accessTokenExpire * 60 * 1000), // Tính bằng phút
+    maxAge: accessTokenExpire * 60 * 1000,
     httpOnly: true,
     sameSite: 'lax',
+    path: '/',
 };
 
 export const refreshTokenOptions: ITokenOptions = {
@@ -28,6 +30,7 @@ export const refreshTokenOptions: ITokenOptions = {
     maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'lax',
+    path: '/',
 };
 
 export const sendToken = (user: IUser, statusCode: number, res: Response) => {

@@ -6,8 +6,12 @@ import ProfileInfo from "./ProfileInfo";
 import ChangePassword from "./ChangePassword";
 import CourseCard from "../Course/CourseCard";
 import { useGetUsersAllCoursesQuery } from "@/redux/features/courses/coursesApi";
-import { useDispatch } from "react-redux"; // <--- Import useDispatch
-import { userLoggedOut } from "@/redux/features/auth/authSlice"; // <--- Import userLoggedOut
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { userLoggedOut } from "@/redux/features/auth/authSlice";
+import { useLogoutMutation } from "@/redux/features/auth/authApi";
+import { apiSlice } from "@/redux/features/api/apiSlice";
+import { useRouter } from "next/navigation";
 
 type Props = { user: any; };
 
@@ -19,23 +23,41 @@ const Profile: FC<Props> = ({ user }) => {
   // Khởi tạo dispatch để dùng Redux
   const dispatch = useDispatch();
 
-  const logOutHandler = async () => { 
+  // Next.js router
+  const router = useRouter();
+
+  // Logout mutation
+  const [
+    logout,
+    { isLoading: isLoggingOut },
+  ] = useLogoutMutation();
+
+  // Logout handler
+  // Logout handler
+  const logOutHandler = async () => {
+    if (isLoggingOut) {
+      return;
+    }
+
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_SERVER_URI}/logout`, {
-        method: 'POST', // Đổi thành POST
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include', 
-        cache: 'no-store' 
-      });
-      
-      dispatch(userLoggedOut()); 
-      await signOut({ redirect: false }); 
-      
-      window.location.href = "/";
-    } catch (error) {
-      console.log("Lỗi xóa cookie backend:", error);
+      // 1. Báo cho Server biết để xóa HttpOnly Cookies (access_token, refresh_token)
+      await logout({}).unwrap();
+
+      // KHÔNG ĐƯỢC GỌI dispatch(userLoggedOut()) TẠI ĐÂY!
+      // Việc giữ lại 'user' trong Redux ở tích tắc này sẽ giúp Header.tsx không bị kích hoạt auto-login ngầm.
+
+      // 2. Gọi signOut của NextAuth và để nó TỰ ĐỘNG CHUYỂN HƯỚNG về trang chủ.
+      // Hành động callbackUrl này sẽ ép trình duyệt làm mới (hard reload) trang.
+      // Khi trang reload, toàn bộ Redux State (bao gồm user và apiSlice) sẽ tự động sạch sẽ.
+      signOut({ callbackUrl: "/" });
+
+    } catch (error: any) {
+      console.error("Logout failed:", error);
+      toast.error(
+        error?.data?.message ||
+        error?.message ||
+        "Đăng xuất thất bại, vui lòng thử lại!"
+      );
     }
   };
 

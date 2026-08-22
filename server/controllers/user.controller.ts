@@ -177,24 +177,60 @@ export const loginUser = CatchAsyncErrors(
 export const logoutUser = CatchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const refreshToken = req.cookies.refresh_token;
       const isProduction = process.env.NODE_ENV === "production";
-      
-      // Khai báo chung 1 bộ option chuẩn để xóa
-      const cookieOptions = {
-        expires: new Date(0), // Set thời gian về cõi hư vô để xóa ngay
+
+      let userId = "";
+
+      /*
+       * Logout không phụ thuộc vào access_token.
+       * Nếu access_token đã hết hạn thì vẫn phải logout được.
+       * Lấy userId từ refresh_token nếu token còn hợp lệ.
+       */
+      if (refreshToken) {
+        try {
+          const decoded = jwt.verify(
+            refreshToken,
+            process.env.REFRESH_TOKEN as string,
+          ) as JwtPayload;
+
+          userId = decoded?.id?.toString() || "";
+        } catch (error) {
+          /*
+           * Refresh token hết hạn / không hợp lệ:
+           * vẫn tiếp tục clear cookie.
+           */
+        }
+      }
+
+      /*
+       * Xóa session Redis nếu lấy được userId.
+       */
+      if (userId) {
+        await redis.del(userId);
+      }
+
+      /*
+       * Xóa access_token.
+       */
+      res.clearCookie("access_token", {
         httpOnly: true,
-        sameSite: isProduction ? "none" as const : "lax" as const,
+        sameSite: isProduction ? "none" : "lax",
         secure: isProduction,
-      };
+        path: "/",
+      });
 
-      // Thực hiện xóa
-      res.cookie("access_token", "", cookieOptions);
-      res.cookie("refresh_token", "", cookieOptions);
+      /*
+       * Xóa refresh_token.
+       */
+      res.clearCookie("refresh_token", {
+        httpOnly: true,
+        sameSite: isProduction ? "none" : "lax",
+        secure: isProduction,
+        path: "/",
+      });
 
-      const userId = req.user?._id || "";
-      await redis.del(userId.toString());
-
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Đăng xuất thành công",
       });
