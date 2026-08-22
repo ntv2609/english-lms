@@ -18,6 +18,14 @@ interface ILink extends Document {
   url: string;
 }
 
+// BỔ SUNG: Interface cho bài tập trắc nghiệm (Quiz)
+interface IQuiz extends Document {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  explanation: string;
+}
+
 interface ICourseData extends Document {
   title: string;
   description: string;
@@ -29,7 +37,8 @@ interface ICourseData extends Document {
   links: ILink[];
   suggestion: string;
   questions: IComment[];
-  homework?: string; // BỔ SUNG TRƯỜNG BÀI TẬP VỀ NHÀ
+  homework?: string;
+  quizzes?: IQuiz[]; // BỔ SUNG: Mảng lưu trữ dữ liệu Quiz
 }
 
 interface ICourse extends Document {
@@ -71,6 +80,14 @@ const commentSchema = new Schema<IComment>({
   commentReplies: [Object],
 }, { timestamps: true });
 
+// BỔ SUNG: Schema cho bài tập trắc nghiệm
+const quizSchema = new Schema<IQuiz>({
+  question: String,
+  options: [String],
+  correctAnswer: String,
+  explanation: String,
+});
+
 const courseDataSchema = new Schema<ICourseData>({
   videoUrl: String,
   videoThumbnail: Object,
@@ -82,7 +99,8 @@ const courseDataSchema = new Schema<ICourseData>({
   links: [linkSchema],
   suggestion: String,
   questions: [commentSchema],
-  homework: String, // BỔ SUNG VÀO SCHEMA
+  homework: String,
+  quizzes: [quizSchema], // BỔ SUNG VÀO SCHEMA
 });
 
 const courseSchema = new Schema<ICourse>({

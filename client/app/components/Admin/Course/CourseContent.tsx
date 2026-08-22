@@ -28,21 +28,21 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
 
   const newContentHandler = (item: any) => {
     if (item.title === "" || item.description === "" || item.videoUrl === "") {
-      toast.error("Please fill required fields!");
+      toast.error("Vui lòng điền các thông tin bắt buộc!");
     } else {
       let sec = "";
       if (courseContentData.length > 0) sec = courseContentData[courseContentData.length - 1].videoSection;
-      setCourseContentData([...courseContentData, { videoUrl: "", title: "", description: "", videoLength: "", videoSection: sec, homework: "", links: [{ title: "", url: "" }] }]);
+      setCourseContentData([...courseContentData, { videoUrl: "", title: "", description: "", videoLength: "", videoSection: sec, homework: "", quizzes: [], links: [{ title: "", url: "" }] }]);
     }
   };
 
   const addNewSection = () => {
     const last = courseContentData[courseContentData.length - 1];
     if (last.title === "" || last.description === "" || last.videoUrl === "") {
-      toast.error("Please fill required fields first!");
+      toast.error("Vui lòng hoàn thành phần trước trước khi tạo mới!");
     } else {
       setActiveSection(activeSection + 1);
-      setCourseContentData([...courseContentData, { videoUrl: "", title: "", description: "", videoLength: "", videoSection: `Untitled Section ${activeSection}`, homework: "", links: [{ title: "", url: "" }] }]);
+      setCourseContentData([...courseContentData, { videoUrl: "", title: "", description: "", videoLength: "", videoSection: `Untitled Section ${activeSection}`, homework: "", quizzes: [], links: [{ title: "", url: "" }] }]);
     }
   };
 
@@ -57,22 +57,34 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
       const contextData = `${currentLesson.title} - ${currentLesson.description}`;
       const res = await generateQuiz({ contextData, questionCount: 5, level: "Intermediate" }).unwrap();
       
-      let quizText = `\n\n--- 🤖 BÀI TẬP TRẮC NGHIỆM (AI SINH TỰ ĐỘNG) ---\n`;
-      res.questions.forEach((q: any, i: number) => {
-        quizText += `\nCâu ${i + 1}: ${q.question}\n`;
-        q.options.forEach((opt: string, j: number) => {
-          quizText += `  ${String.fromCharCode(65 + j)}. ${opt}\n`;
-        });
-        quizText += `=> Đáp án: ${q.correctAnswer}\n`;
-        quizText += `* Giải thích: ${q.explanation}\n`;
-      });
-
       const arr = [...courseContentData];
-      arr[index].description = (arr[index].description || "") + quizText;
+      arr[index].quizzes = res.questions;
       setCourseContentData(arr);
-      toast.success("AI đã tạo xong 5 câu hỏi trắc nghiệm!");
+      toast.success("AI đã tạo và lưu thành công bộ câu hỏi trắc nghiệm!");
     } catch (error: any) {
       toast.error(error?.data?.message || "Lỗi AI, vui lòng thử lại!");
+    }
+  };
+
+  const handleDeleteQuiz = (index: number) => {
+      const arr = [...courseContentData];
+      arr[index].quizzes = [];
+      setCourseContentData(arr);
+      toast.success("Đã xóa bộ câu hỏi trắc nghiệm.");
+  };
+
+  // HÀM CHUYỂN TRANG FIX LỖI "KHÔNG NEXT ĐƯỢC"
+  const handleNext = () => {
+    const lastItem = courseContentData[courseContentData.length - 1];
+    if (
+      lastItem.title === "" ||
+      lastItem.description === "" ||
+      lastItem.videoUrl === ""
+    ) {
+      toast.error("Vui lòng điền đầy đủ Tiêu đề, ID Video và Mô tả cho bài học cuối cùng!");
+    } else {
+      handleSubmit(); // Lưu data vào form tổng
+      setActive(active + 1); // Nhảy sang tab Xem trước
     }
   };
 
@@ -149,7 +161,31 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                     <textarea rows={6} className={styles.input + " !h-auto py-3 resize-none"} value={item.description} onChange={(e) => { const arr=[...courseContentData]; arr[index].description=e.target.value; setCourseContentData(arr); }} />
                   </div>
 
-                  {/* BỔ SUNG Ô NHẬP BÀI TẬP WRITING CHO TỪNG VIDEO */}
+                  {item.quizzes && item.quizzes.length > 0 && (
+                      <div className="bg-emerald-500/5 border border-emerald-500/20 p-4 rounded-lg">
+                          <div className="flex items-center justify-between mb-3">
+                              <h4 className="text-sm font-bold text-emerald-600 dark:text-emerald-400">✅ {item.quizzes.length} Câu hỏi trắc nghiệm đã được sinh</h4>
+                              <button type="button" className="text-xs text-red-500 hover:underline" onClick={() => handleDeleteQuiz(index)}>Xóa bộ đề</button>
+                          </div>
+                          <div className="space-y-4 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                              {item.quizzes.map((quiz: any, qIndex: number) => (
+                                  <div key={qIndex} className="bg-white dark:bg-[#111] p-3 rounded border border-black/5 dark:border-white/5">
+                                      <p className="text-sm font-semibold mb-2 text-black dark:text-white">Câu {qIndex + 1}: {quiz.question}</p>
+                                      <ul className="text-xs text-neutral-600 dark:text-neutral-400 space-y-1 mb-2">
+                                          {quiz.options.map((opt: string, oIndex: number) => (
+                                              <li key={oIndex}>- {opt}</li>
+                                          ))}
+                                      </ul>
+                                      <div className="text-xs">
+                                          <span className="font-bold text-emerald-500">Đáp án:</span> {quiz.correctAnswer} <br/>
+                                          <span className="text-neutral-500 italic">Giải thích: {quiz.explanation}</span>
+                                      </div>
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
+                  )}
+
                   <div className="pt-2">
                     <label className={styles.label}>Bài tập Writing / Đề bài (Tùy chọn)</label>
                     <textarea 
@@ -198,7 +234,8 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
       </form>
       <div className="w-full flex justify-between mt-10">
         <button className={`${styles.button} !w-32 !bg-transparent !text-black dark:!text-white border border-black/20 dark:border-white/20`} onClick={() => setActive(active - 1)}>Back</button>
-        <button className={`${styles.button} !w-32`} onClick={() => handleSubmit()}>Next</button>
+        {/* THAY ĐỔI Ở NÚT NEXT */}
+        <button className={`${styles.button} !w-32`} onClick={handleNext}>Next</button>
       </div>
     </div>
   );

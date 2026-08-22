@@ -20,6 +20,10 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
   const [reply, setReply] = useState("");
   const [reviewId, setReviewId] = useState("");
 
+  // Quiz State
+  const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
+  const [isQuizSubmitted, setIsQuizSubmitted] = useState(false);
+
   const { data: courseData, refetch: courseRefetch } = useGetCourseDetailsQuery(id, { refetchOnMountOrArgChange: true });
   const course = courseData?.course;
   const isReviewExists = course?.reviews?.find((item: any) => item.user._id === user._id);
@@ -36,7 +40,36 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
     if (rrSuccess) { setReply(""); setReviewId(""); courseRefetch(); toast.success("Phản hồi đánh giá thành công"); }
   }, [qSuccess, aSuccess, rSuccess, rrSuccess, refetch, courseRefetch]);
 
-  const tabs = ["Tổng quan", "Tài nguyên", "Hỏi đáp", "Đánh giá", "Luyện Viết AI"];
+  // Reset quiz state khi chuyển video
+  useEffect(() => {
+    setUserAnswers({});
+    setIsQuizSubmitted(false);
+  }, [activeVideo]);
+
+  const tabs = ["Tổng quan", "Tài nguyên", "Hỏi đáp", "Đánh giá", "Luyện Viết AI", "Bài tập (Quiz)"];
+  const quizzes = data[activeVideo]?.quizzes || [];
+
+  const handleSelectAnswer = (qIndex: number, option: string) => {
+    if (isQuizSubmitted) return;
+    setUserAnswers(prev => ({ ...prev, [qIndex]: option }));
+  };
+
+  const handleSubmitQuiz = () => {
+    if (Object.keys(userAnswers).length < quizzes.length) {
+      toast.error("Vui lòng trả lời đầy đủ các câu hỏi trước khi nộp bài!");
+      return;
+    }
+    setIsQuizSubmitted(true);
+    toast.success("Nộp bài thành công! Xem điểm số và giải thích chi tiết bên dưới.");
+  };
+
+  const calculateScore = () => {
+    let score = 0;
+    quizzes.forEach((quiz: any, index: number) => {
+      if (userAnswers[index] === quiz.correctAnswer) score++;
+    });
+    return score;
+  };
 
   return (
     <div className="w-full relative">
@@ -105,17 +138,17 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
                       {questionId === q._id && (
                         <div className="mt-6 pl-4 border-l-2 border-black/10 dark:border-white/10 space-y-6">
                           {q.commentReplies.map((r:any, i:number) => (
-                             <div key={i} className="flex gap-3">
-                               <img src={r.user.avatar?.url || "/assets/avatar.png"} className="w-8 h-8 rounded-full object-cover shrink-0" alt="avatar"/>
-                               <div>
-                                 <div className="flex items-baseline gap-2 mb-1">
-                                    <span className="font-semibold text-sm text-black dark:text-white">{r.user.name}</span>
-                                    {r.user.role === 'admin' && <span className="text-[9px] bg-blue-500/20 text-blue-500 px-1 rounded uppercase font-bold tracking-widest">Admin</span>}
-                                    <span className="text-[10px] text-neutral-500 font-mono">{format(r.createdAt)}</span>
-                                 </div>
-                                 <p className="text-neutral-700 dark:text-neutral-300 text-sm">{r.comment}</p>
-                               </div>
-                             </div>
+                              <div key={i} className="flex gap-3">
+                                <img src={r.user.avatar?.url || "/assets/avatar.png"} className="w-8 h-8 rounded-full object-cover shrink-0" alt="avatar"/>
+                                <div>
+                                  <div className="flex items-baseline gap-2 mb-1">
+                                     <span className="font-semibold text-sm text-black dark:text-white">{r.user.name}</span>
+                                     {r.user.role === 'admin' && <span className="text-[9px] bg-blue-500/20 text-blue-500 px-1 rounded uppercase font-bold tracking-widest">Admin</span>}
+                                     <span className="text-[10px] text-neutral-500 font-mono">{format(r.createdAt)}</span>
+                                  </div>
+                                  <p className="text-neutral-700 dark:text-neutral-300 text-sm">{r.comment}</p>
+                                </div>
+                              </div>
                           ))}
                           <div className="flex gap-3 mt-4">
                             <input type="text" className="flex-1 bg-transparent border-b border-black/20 dark:border-white/20 text-sm text-black dark:text-white outline-none focus:border-blue-500 py-1" placeholder="Nhập câu trả lời..." value={answer} onChange={e=>setAnswer(e.target.value)}/>
@@ -196,8 +229,87 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
         {activeBar === 4 && (
           <AIWriting 
             topic={data[activeVideo].title} 
-            homework={data[activeVideo].homework} // Truyền nội dung bài tập sang cho AIWriting
+            homework={data[activeVideo].homework}
           />
+        )}
+
+        {/* BỔ SUNG Tab Bài tập (Interactive Quiz) */}
+        {activeBar === 5 && (
+          <div className="w-full">
+            {quizzes.length === 0 ? (
+                <div className="py-10 text-center border border-dashed border-black/10 dark:border-white/10 rounded-xl">
+                  <p className="text-neutral-500 italic">Bài học này chưa có bài tập trắc nghiệm.</p>
+                </div>
+            ) : (
+                <div className="space-y-8">
+                  {isQuizSubmitted && (
+                    <div className="p-6 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center justify-between">
+                        <div>
+                            <h3 className="font-Josefin font-bold text-blue-600 dark:text-blue-400 text-xl mb-1">Kết quả bài làm</h3>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400">Bạn đã hoàn thành bài thi trắc nghiệm.</p>
+                        </div>
+                        <div className="text-4xl font-black text-blue-600 dark:text-blue-400">
+                            {calculateScore()} / {quizzes.length}
+                        </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-6">
+                      {quizzes.map((quiz: any, qIndex: number) => {
+                          const isCorrect = userAnswers[qIndex] === quiz.correctAnswer;
+                          const hasAnswered = userAnswers[qIndex] !== undefined;
+
+                          return (
+                              <div key={qIndex} className={`p-6 rounded-xl border ${isQuizSubmitted ? (isCorrect ? "border-emerald-500/50 bg-emerald-500/5" : "border-red-500/50 bg-red-500/5") : "border-black/5 dark:border-white/5 bg-[#FAFAFA] dark:bg-[#0A0A0A]"}`}>
+                                  <h4 className="font-semibold text-black dark:text-white text-lg mb-4">Câu {qIndex + 1}: {quiz.question}</h4>
+                                  <div className="space-y-3">
+                                      {quiz.options.map((option: string, oIndex: number) => {
+                                          const isSelected = userAnswers[qIndex] === option;
+                                          const isActuallyCorrect = option === quiz.correctAnswer;
+                                          
+                                          let optionStyle = "border-black/10 dark:border-white/10 hover:border-blue-500";
+                                          if (isQuizSubmitted) {
+                                              if (isActuallyCorrect) optionStyle = "border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold";
+                                              else if (isSelected && !isCorrect) optionStyle = "border-red-500 bg-red-500/10 text-red-600 dark:text-red-400";
+                                              else optionStyle = "border-black/5 dark:border-white/5 opacity-50 cursor-not-allowed";
+                                          } else if (isSelected) {
+                                              optionStyle = "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold";
+                                          }
+
+                                          return (
+                                              <div 
+                                                  key={oIndex} 
+                                                  onClick={() => handleSelectAnswer(qIndex, option)}
+                                                  className={`p-3 rounded-lg border cursor-pointer transition-all ${optionStyle}`}
+                                              >
+                                                  {option}
+                                              </div>
+                                          );
+                                      })}
+                                  </div>
+
+                                  {isQuizSubmitted && (
+                                      <div className={`mt-4 p-4 rounded-lg text-sm ${isCorrect ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-red-500/10 text-red-700 dark:text-red-300"}`}>
+                                          <p className="font-bold mb-1">{isCorrect ? "✅ Chính xác!" : "❌ Sai rồi!"}</p>
+                                          <p><strong>Giải thích:</strong> {quiz.explanation}</p>
+                                      </div>
+                                  )}
+                              </div>
+                          );
+                      })}
+                  </div>
+
+                  {!isQuizSubmitted && (
+                      <button 
+                          onClick={handleSubmitQuiz}
+                          className={`${styles.button} !w-full !py-4 text-base tracking-widest`}
+                      >
+                          Nộp bài kiểm tra
+                      </button>
+                  )}
+                </div>
+            )}
+          </div>
         )}
       </div>
       
