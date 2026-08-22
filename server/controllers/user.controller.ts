@@ -48,8 +48,8 @@ export const registrationUser = CatchAsyncErrors(
       console.log(`🔥 MÃ OTP CỦA [${user.email}] LÀ: ${activationCode}`);
 
       try {
-        // ĐÃ TẮT SENDMAIL
-        /*
+        // BẬT/TẮT SENDMAIL để test thì dùng comment
+        
         const data = { user: { name: user.name }, activationCode };
         const html = await ejs.renderFile(
           path.join(__dirname, "../mails/activation-mail.ejs"),
@@ -61,7 +61,7 @@ export const registrationUser = CatchAsyncErrors(
           template: "activation-mail.ejs",
           data,
         });
-        */
+        // COMMENT ĐẾN ĐÂY
 
         res.status(201).json({
           success: true,
