@@ -4,12 +4,17 @@ import ErrorHandler from "../utils/ErrorHandler";
 // Hàm gọi API trực tiếp tới Google Gemini sử dụng model chuẩn hiện hành gemini-2.5-flash
 export const requestGeminiCompletion = async (prompt: string): Promise<string> => {
     const apiKey = process.env.GEMINI_API_KEY;
+
+    // --- THÊM DÒNG NÀY ĐỂ DEBUG ---
+    console.log("🔑 Đang sử dụng GEMINI_API_KEY:", apiKey ? apiKey.substring(0, 8) + "..." : "KHÔNG TÌM THẤY KEY!");
+    // ----------------------------
+
     if (!apiKey) {
         throw new ErrorHandler("Missing GEMINI_API_KEY in environment variables", 500);
     }
 
     // Sử dụng model chính thức đang hoạt động: gemini-2.5-flash
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
 
     try {
         const response = await axios.post(endpoint, {
