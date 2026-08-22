@@ -27,8 +27,18 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
   });
 
   useEffect(() => {
-    if (isSuccess) { toast.success("Đăng nhập thành công"); setOpen(false); }
-    if (error && "data" in error) toast.error((error as any).data.message);
+    if (isSuccess) { 
+        toast.success("Đăng nhập thành công"); 
+        setOpen(false); 
+    }
+    if (error) {
+        console.log("🔥 LỖI TẠI LOGIN:", error);
+        if ("data" in error) {
+            toast.error((error as any).data.message);
+        } else {
+            toast.error(`Lỗi hệ thống: ${(error as any).error || "Không thể kết nối Server"}`);
+        }
+    }
   }, [isSuccess, error, setOpen]);
 
   const { errors, touched, values, handleChange, handleSubmit } = formik;

@@ -22,8 +22,21 @@ const SignUp: FC<Props> = ({ setRoute }) => {
   const [register, { data, error, isSuccess }] = useRegisterMutation();
 
   useEffect(() => {
-    if (isSuccess) { toast.success("Đăng ký thành công, vui lòng xác nhận OTP"); setRoute("Verification"); }
-    if (error && "data" in error) toast.error((error as any).data.message);
+    if (isSuccess) { 
+        toast.success("Đăng ký thành công, vui lòng xác nhận OTP"); 
+        setRoute("Verification"); 
+    }
+    if (error) {
+        // MẸO DEV: In toàn bộ object error ra console để debug
+        console.log("🔥 LỖI TẠI SIGNUP:", error);
+
+        if ("data" in error) {
+            toast.error((error as any).data.message);
+        } else {
+            // Nếu là lỗi mạng, CORS, sai URL... nó sẽ lọt vào đây
+            toast.error(`Lỗi hệ thống: ${(error as any).error || "Không thể kết nối Server"}`);
+        }
+    }
   }, [isSuccess, error, setRoute]);
 
   const formik = useFormik({
