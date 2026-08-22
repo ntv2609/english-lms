@@ -20,8 +20,28 @@ const CourseData: FC<Props> = ({ benefits, setBenefits, prerequisites, setPrereq
         <div className="space-y-4">
           {benefits.map((benefit, index) => (
             <div key={index} className="flex items-center gap-3">
-              <input type="text" className={styles.input + " !mt-0"} value={benefit.title} onChange={(e) => { const arr = [...benefits]; arr[index].title = e.target.value; setBenefits(arr); }} placeholder="Ví dụ: Nắm vững Node.js cơ bản..." />
-              <AiOutlineDelete size={24} className="text-neutral-400 hover:text-red-500 cursor-pointer shrink-0" onClick={() => { if(benefits.length > 1) { const arr = [...benefits]; arr.splice(index, 1); setBenefits(arr); } }} />
+              <input 
+                type="text" 
+                className={styles.input + " !mt-0"} 
+                value={benefit.title} 
+                onChange={(e) => { 
+                  // KIẾN TRÚC MỚI: Immutable Update
+                  const arr = [...benefits]; 
+                  arr[index] = { ...arr[index], title: e.target.value }; 
+                  setBenefits(arr); 
+                }} 
+                placeholder="Ví dụ: Nắm vững Node.js cơ bản..." 
+              />
+              <AiOutlineDelete 
+                size={24} 
+                className="text-neutral-400 hover:text-red-500 cursor-pointer shrink-0" 
+                onClick={() => { 
+                  if(benefits.length > 1) { 
+                    const arr = benefits.filter((_, i) => i !== index); 
+                    setBenefits(arr); 
+                  } 
+                }} 
+              />
             </div>
           ))}
           <button className="text-sm font-medium text-blue-500 hover:text-blue-400 flex items-center gap-2" onClick={() => setBenefits([...benefits, { title: "" }])}>
@@ -35,8 +55,28 @@ const CourseData: FC<Props> = ({ benefits, setBenefits, prerequisites, setPrereq
         <div className="space-y-4">
           {prerequisites.map((req, index) => (
             <div key={index} className="flex items-center gap-3">
-              <input type="text" className={styles.input + " !mt-0"} value={req.title} onChange={(e) => { const arr = [...prerequisites]; arr[index].title = e.target.value; setPrerequisites(arr); }} placeholder="Ví dụ: Cần có máy tính kết nối mạng..." />
-              <AiOutlineDelete size={24} className="text-neutral-400 hover:text-red-500 cursor-pointer shrink-0" onClick={() => { if(prerequisites.length > 1) { const arr = [...prerequisites]; arr.splice(index, 1); setPrerequisites(arr); } }} />
+              <input 
+                type="text" 
+                className={styles.input + " !mt-0"} 
+                value={req.title} 
+                onChange={(e) => { 
+                  // KIẾN TRÚC MỚI: Immutable Update
+                  const arr = [...prerequisites]; 
+                  arr[index] = { ...arr[index], title: e.target.value }; 
+                  setPrerequisites(arr); 
+                }} 
+                placeholder="Ví dụ: Cần có máy tính kết nối mạng..." 
+              />
+              <AiOutlineDelete 
+                size={24} 
+                className="text-neutral-400 hover:text-red-500 cursor-pointer shrink-0" 
+                onClick={() => { 
+                  if(prerequisites.length > 1) { 
+                    const arr = prerequisites.filter((_, i) => i !== index); 
+                    setPrerequisites(arr); 
+                  } 
+                }} 
+              />
             </div>
           ))}
           <button className="text-sm font-medium text-blue-500 hover:text-blue-400 flex items-center gap-2" onClick={() => setPrerequisites([...prerequisites, { title: "" }])}>

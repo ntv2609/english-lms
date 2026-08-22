@@ -58,8 +58,9 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
       const res = await generateQuiz({ contextData, questionCount: 5, level: "Intermediate" }).unwrap();
       
       const arr = [...courseContentData];
-      arr[index].quizzes = res.questions;
+      arr[index] = { ...arr[index], quizzes: res.questions };
       setCourseContentData(arr);
+      
       toast.success("AI đã tạo và lưu thành công bộ câu hỏi trắc nghiệm!");
     } catch (error: any) {
       toast.error(error?.data?.message || "Lỗi AI, vui lòng thử lại!");
@@ -68,12 +69,12 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
 
   const handleDeleteQuiz = (index: number) => {
       const arr = [...courseContentData];
-      arr[index].quizzes = [];
+      arr[index] = { ...arr[index], quizzes: [] };
       setCourseContentData(arr);
       toast.success("Đã xóa bộ câu hỏi trắc nghiệm.");
   };
 
-  // HÀM CHUYỂN TRANG FIX LỖI "KHÔNG NEXT ĐƯỢC"
+  // KIẾN TRÚC MỚI: Bổ sung logic NEXT chuyển trang an toàn
   const handleNext = () => {
     const lastItem = courseContentData[courseContentData.length - 1];
     if (
@@ -83,8 +84,8 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
     ) {
       toast.error("Vui lòng điền đầy đủ Tiêu đề, ID Video và Mô tả cho bài học cuối cùng!");
     } else {
-      handleSubmit(); // Lưu data vào form tổng
-      setActive(active + 1); // Nhảy sang tab Xem trước
+      handleSubmit(); 
+      setActive(active + 1); 
     }
   };
 
@@ -103,7 +104,7 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                     value={item.videoSection}
                     onChange={(e) => {
                       const arr = [...courseContentData];
-                      arr[index].videoSection = e.target.value;
+                      arr[index] = { ...arr[index], videoSection: e.target.value };
                       setCourseContentData(arr);
                     }}
                   />
@@ -136,15 +137,15 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                 <div className="mt-6 space-y-5 pl-4 border-l-2 border-black/5 dark:border-white/5">
                   <div>
                     <label className={styles.label}>Video Title</label>
-                    <input type="text" className={styles.input} value={item.title} onChange={(e) => { const arr=[...courseContentData]; arr[index].title=e.target.value; setCourseContentData(arr); }} />
+                    <input type="text" className={styles.input} value={item.title} onChange={(e) => { const arr=[...courseContentData]; arr[index]={...arr[index], title: e.target.value}; setCourseContentData(arr); }} />
                   </div>
                   <div>
                     <label className={styles.label}>Video ID (VdoCipher)</label>
-                    <input type="text" className={styles.input} value={item.videoUrl} onChange={(e) => { const arr=[...courseContentData]; arr[index].videoUrl=e.target.value; setCourseContentData(arr); }} />
+                    <input type="text" className={styles.input} value={item.videoUrl} onChange={(e) => { const arr=[...courseContentData]; arr[index]={...arr[index], videoUrl: e.target.value}; setCourseContentData(arr); }} />
                   </div>
                   <div>
                     <label className={styles.label}>Video Length (minutes)</label>
-                    <input type="number" className={styles.input} value={item.videoLength} onChange={(e) => { const arr=[...courseContentData]; arr[index].videoLength=e.target.value; setCourseContentData(arr); }} />
+                    <input type="number" className={styles.input} value={item.videoLength} onChange={(e) => { const arr=[...courseContentData]; arr[index]={...arr[index], videoLength: e.target.value}; setCourseContentData(arr); }} />
                   </div>
                   <div>
                     <div className="flex items-center justify-between">
@@ -158,7 +159,7 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                         🪄 {isGeneratingQuiz ? "Đang sinh đề..." : "Trợ lý AI: Sinh trắc nghiệm"}
                       </button>
                     </div>
-                    <textarea rows={6} className={styles.input + " !h-auto py-3 resize-none"} value={item.description} onChange={(e) => { const arr=[...courseContentData]; arr[index].description=e.target.value; setCourseContentData(arr); }} />
+                    <textarea rows={6} className={styles.input + " !h-auto py-3 resize-none"} value={item.description} onChange={(e) => { const arr=[...courseContentData]; arr[index]={...arr[index], description: e.target.value}; setCourseContentData(arr); }} />
                   </div>
 
                   {item.quizzes && item.quizzes.length > 0 && (
@@ -193,7 +194,7 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                       placeholder="Nhập đề bài Writing (Homework) cho học viên tại đây. AI sẽ dùng đề này để chấm điểm..." 
                       className={styles.input + " !h-auto py-3 resize-none bg-blue-500/5 border-blue-500/20"} 
                       value={item.homework || ""} 
-                      onChange={(e) => { const arr=[...courseContentData]; arr[index].homework=e.target.value; setCourseContentData(arr); }} 
+                      onChange={(e) => { const arr=[...courseContentData]; arr[index]={...arr[index], homework: e.target.value}; setCourseContentData(arr); }} 
                     />
                   </div>
                   
@@ -204,16 +205,34 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
                           <label className={styles.label}>Resource Link {linkIndex + 1}</label>
                           <AiOutlineDelete size={16} className="text-neutral-400 hover:text-red-500 cursor-pointer" onClick={() => {
                             if(linkIndex>0){
-                              const arr=[...courseContentData]; arr[index].links.splice(linkIndex,1); setCourseContentData(arr);
+                              const arr=[...courseContentData]; 
+                              const newLinks = arr[index].links.filter((_, i) => i !== linkIndex);
+                              arr[index] = {...arr[index], links: newLinks};
+                              setCourseContentData(arr);
                             }
                           }}/>
                         </div>
-                        <input type="text" placeholder="Title" className={styles.input + " mb-2"} value={link.title} onChange={(e) => { const arr=[...courseContentData]; arr[index].links[linkIndex].title=e.target.value; setCourseContentData(arr); }} />
-                        <input type="text" placeholder="URL" className={styles.input} value={link.url} onChange={(e) => { const arr=[...courseContentData]; arr[index].links[linkIndex].url=e.target.value; setCourseContentData(arr); }} />
+                        <input type="text" placeholder="Title" className={styles.input + " mb-2"} value={link.title} onChange={(e) => { 
+                          const arr=[...courseContentData]; 
+                          const newLinks = [...arr[index].links];
+                          newLinks[linkIndex] = {...newLinks[linkIndex], title: e.target.value};
+                          arr[index] = {...arr[index], links: newLinks};
+                          setCourseContentData(arr); 
+                        }} />
+                        <input type="text" placeholder="URL" className={styles.input} value={link.url} onChange={(e) => { 
+                          const arr=[...courseContentData]; 
+                          const newLinks = [...arr[index].links];
+                          newLinks[linkIndex] = {...newLinks[linkIndex], url: e.target.value};
+                          arr[index] = {...arr[index], links: newLinks};
+                          setCourseContentData(arr); 
+                        }} />
                       </div>
                     ))}
                     <button type="button" className="text-sm font-medium text-blue-500 hover:text-blue-400 flex items-center gap-1" onClick={() => {
-                      const arr=[...courseContentData]; arr[index].links.push({title:"",url:""}); setCourseContentData(arr);
+                      const arr=[...courseContentData]; 
+                      const newLinks = [...(arr[index].links || []), {title:"", url:""}];
+                      arr[index] = {...arr[index], links: newLinks};
+                      setCourseContentData(arr);
                     }}>
                       <BsLink45Deg size={18} /> Add Link
                     </button>
@@ -234,7 +253,6 @@ const CourseContent: FC<Props> = ({ courseContentData, setCourseContentData, act
       </form>
       <div className="w-full flex justify-between mt-10">
         <button className={`${styles.button} !w-32 !bg-transparent !text-black dark:!text-white border border-black/20 dark:border-white/20`} onClick={() => setActive(active - 1)}>Back</button>
-        {/* THAY ĐỔI Ở NÚT NEXT */}
         <button className={`${styles.button} !w-32`} onClick={handleNext}>Next</button>
       </div>
     </div>

@@ -26,21 +26,39 @@ const EditCourse: FC<Props> = ({ id }) => {
   const [courseInfo, setCourseInfo] = useState({ name: "", description: "", categories: "", price: "", estimatedPrice: "", tags: "", level: "", demoUrl: "", thumbnail: "" });
   const [benefits, setBenefits] = useState([{ title: "" }]);
   const [prerequisites, setPrerequisites] = useState([{ title: "" }]);
-  // BỔ SUNG: Thuộc tính homework: "" và quizzes: [] vào initial state
   const [courseContentData, setCourseContentData] = useState([{ videoUrl: "", title: "", description: "", videoLength: "", videoSection: "Untitled Section", homework: "", quizzes: [], links: [{ title: "", url: "" }], suggestion: "" }]);
   const [courseData, setCourseData] = useState({});
 
   useEffect(() => {
     if (editCourseData) {
-      setCourseInfo({ name: editCourseData.name, description: editCourseData.description, categories: editCourseData.categories, price: editCourseData.price, estimatedPrice: editCourseData.estimatedPrice, tags: editCourseData.tags, level: editCourseData.level, demoUrl: editCourseData.demoUrl, thumbnail: editCourseData?.thumbnail?.url });
-      setBenefits(editCourseData.benefits);
-      setPrerequisites(editCourseData.prerequisites);
-      setCourseContentData(editCourseData.courseData);
+      setCourseInfo({ 
+        name: editCourseData.name, 
+        description: editCourseData.description, 
+        categories: editCourseData.categories, 
+        price: editCourseData.price, 
+        estimatedPrice: editCourseData.estimatedPrice, 
+        tags: editCourseData.tags, 
+        level: editCourseData.level, 
+        demoUrl: editCourseData.demoUrl, 
+        thumbnail: editCourseData?.thumbnail?.url 
+      });
+      
+      // KIẾN TRÚC MỚI: Deep Clone (Rã đông) dữ liệu từ Redux RTK Query 
+      // để loại bỏ trạng thái Read-Only (Đóng băng), cho phép chỉnh sửa ở component con
+      if (editCourseData.benefits) setBenefits(JSON.parse(JSON.stringify(editCourseData.benefits)));
+      if (editCourseData.prerequisites) setPrerequisites(JSON.parse(JSON.stringify(editCourseData.prerequisites)));
+      if (editCourseData.courseData) setCourseContentData(JSON.parse(JSON.stringify(editCourseData.courseData)));
     }
   }, [editCourseData]);
 
   const handleSubmit = async () => {
-    setCourseData({ ...courseInfo, totalVideos: courseContentData.length, benefits: benefits.map(b => ({title: b.title})), prerequisites: prerequisites.map(p => ({title: p.title})), courseData: courseContentData });
+    setCourseData({ 
+      ...courseInfo, 
+      totalVideos: courseContentData.length, 
+      benefits: benefits.map(b => ({title: b.title})), 
+      prerequisites: prerequisites.map(p => ({title: p.title})), 
+      courseData: courseContentData 
+    });
   };
 
   return (
