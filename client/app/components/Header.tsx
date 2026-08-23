@@ -11,7 +11,7 @@ import Verification from "./Auth/Verification";
 import ForgotPassword from "./Auth/ForgotPassword";
 import ResetPassword from "./Auth/ResetPassword";
 import { useSelector } from "react-redux";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react"; // BỔ SUNG: Nhập thêm signOut
 import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
 
@@ -21,17 +21,36 @@ const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hasSocialAuthFired, setHasSocialAuthFired] = useState(false); // CỜ KIỂM SOÁT VÒNG LẶP
+
   const { user } = useSelector((state: any) => state.auth);
   const { data } = useSession();
   const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
 
   useEffect(() => { setMounted(true); }, []);
 
+  // 1. CHỈ TRIGGER API 1 LẦN DUY NHẤT:
   useEffect(() => {
-    if (!user && data) socialAuth({ email: data?.user?.email, name: data?.user?.name, avatar: data?.user?.image });
-    if (data !== null && isSuccess) { toast.success("Đăng nhập thành công"); setOpen(false); }
-    if (error && "data" in error) { toast.error((error as any).data.message); setOpen(false); }
-  }, [data, user, isSuccess, error, socialAuth, setOpen]);
+    if (!user && data && !hasSocialAuthFired) {
+      setHasSocialAuthFired(true); // Đánh dấu là đã gọi rồi, cấm gọi lại
+      socialAuth({ email: data?.user?.email, name: data?.user?.name, avatar: data?.user?.image });
+    }
+  }, [data, user, hasSocialAuthFired, socialAuth]);
+
+  // 2. HỨNG KẾT QUẢ VÀ XỬ LÝ LỖI (KHÔNG TRIGGER LẠI API):
+  useEffect(() => {
+    if (isSuccess) { 
+      toast.success("Đăng nhập thành công"); 
+      setOpen(false); 
+    }
+    if (error && "data" in error) { 
+      toast.error((error as any).data.message); 
+      setOpen(false); 
+      // FIX LỖI CHẶN HỌNG BẰNG CÁCH HỦY SESSION NEXTAUTH
+      // Dùng redirect: false để không bị F5 chớp trang
+      signOut({ redirect: false }); 
+    }
+  }, [isSuccess, error, setOpen]);
 
   useEffect(() => {
     const handleScroll = () => setActive(window.scrollY > 50);

@@ -1,27 +1,31 @@
 "use client";
 import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLoadUserQuery } from '@/redux/features/api/apiSlice';
 import Loader from '../components/Loader/Loader';
 
 interface ProtectedProps { children: React.ReactNode; }
 
 export default function Protected({ children }: ProtectedProps) {
-  // Dùng luôn hook của RTK Query để lấy state Loading chính xác nhất
+  const [mounted, setMounted] = useState(false);
   const { isLoading, data } = useLoadUserQuery(undefined, {});
   const router = useRouter();
 
+  // Ép client phải render xong lần đầu tiên mới bắt đầu xử lý logic
   useEffect(() => {
-    // Chỉ khi API load xong mà không có user mới chuyển hướng
-    if (!isLoading && !data?.user) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !isLoading && !data?.user) {
       router.replace('/');
     }
-  }, [isLoading, data, router]);
+  }, [isLoading, data, router, mounted]);
 
-  // Hiển thị Loader khi đang check Auth (lúc từ MoMo văng về)
+  // FIX HYDRATION: Đảm bảo SSR và CSR lần đầu tiên đều trả về chung 1 kết quả
+  if (!mounted) return <Loader />;
   if (isLoading) return <Loader />;
   
-  // Chặn render component con nếu chưa xác thực xong để tránh vỡ UI
   if (!data?.user) return null;
 
   return <>{children}</>;

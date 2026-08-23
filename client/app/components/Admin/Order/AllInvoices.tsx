@@ -51,7 +51,8 @@ const AllInvoices: FC<Props> = ({ isDashboard }) => {
     { field: "userName", headerName: "HỌ TÊN", flex: isDashboard ? 0.6 : 0.5 },
     ...(isDashboard ? [] : [{ field: "userEmail", headerName: "EMAIL", flex: 1 }, { field: "title", headerName: "TÊN KHÓA HỌC", flex: 1 }]),
     { field: "price", headerName: "SỐ TIỀN", flex: 0.3 },
-    { field: "status", headerName: "TRẠNG THÁI", flex: 0.3, renderCell: (p:any) => <span className={`px-2 py-1 text-xs font-bold rounded ${p.value === 'Success' ? 'bg-emerald-500/10 text-emerald-500' : p.value === 'Pending' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-red-500/10 text-red-500'}`}>{p.value}</span> },
+    // Update thêm giao diện cho label Expired
+    { field: "status", headerName: "TRẠNG THÁI", flex: 0.3, renderCell: (p:any) => <span className={`px-2 py-1 text-xs font-bold rounded ${p.value === 'Success' ? 'bg-emerald-500/10 text-emerald-500' : p.value === 'Pending' ? 'bg-yellow-500/10 text-yellow-500' : p.value === 'Expired' ? 'bg-neutral-500/10 text-neutral-500' : 'bg-red-500/10 text-red-500'}`}>{p.value}</span> },
     { field: "created_at", headerName: "THỜI GIAN", flex: 0.5 },
     ...(isDashboard ? [] : [{ field: "refund", headerName: "HOÀN TIỀN", flex: 0.3, renderCell: (p:any) => p.row.status === 'Success' ? <button onClick={() => { setOrderId(p.row.id); setOpen(true); }} className="text-xs font-bold text-red-500 hover:text-red-400 bg-red-500/10 px-2 py-1 rounded">Hoàn tiền</button> : null }]),
   ];
@@ -87,7 +88,18 @@ const AllInvoices: FC<Props> = ({ isDashboard }) => {
             "& .MuiCheckbox-root": { color: "#3b82f6 !important" },
             "& .MuiDataGrid-toolbarContainer .MuiButton-text": { color: theme === "dark" ? "#fff" : "#000" },
           }}>
-            <DataGrid checkboxSelection={!isDashboard} rows={rows} columns={columns} components={isDashboard ? {} : { Toolbar: GridToolbar }} />
+            <DataGrid 
+                checkboxSelection={!isDashboard} 
+                rows={rows} 
+                columns={columns} 
+                components={isDashboard ? {} : { Toolbar: GridToolbar }} 
+                // FIX LỖI FONT EXCEL: Ép sử dụng bảng mã utf8WithBom
+                componentsProps={isDashboard ? {} : {
+                    toolbar: {
+                        csvOptions: { utf8WithBom: true, fileName: "Danh_sach_don_hang" }
+                    }
+                }}
+            />
           </Box>
         </Box>
       )}
