@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tài khoản bị khóa</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style type="text/css">
+        body { margin: 0; padding: 0; min-width: 100%; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; background-color: #FAFAFA; color: #222222; }
+        .email-wrapper { max-width: 600px; margin: 0 auto; }
+        .email-header { background-color: #ff4d4f; padding: 24px; color: #ffffff; text-align: center; }
+        .email-body { padding: 24px; background-color: #ffffff; }
+        h1 { margin: 0; }
+        .reason-box { background-color: #fff1f0; padding: 16px; border-left: 4px solid #ff4d4f; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-header"><h1>Thông báo khóa tài khoản</h1></div>
+        <div class="email-body">
+            <p>Chào <%= user.name %>,</p>
+            <p>Tài khoản EngGo của bạn vừa bị khóa bởi Quản trị viên hệ thống do vi phạm chính sách sử dụng.</p>
+            <div class="reason-box"><strong>Lý do:</strong> <%= reason %></div>
+            <p>Nếu bạn cho rằng đây là sự nhầm lẫn, vui lòng liên hệ bộ phận hỗ trợ qua email support@englishlms.com.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -5,52 +5,63 @@ import jwt from 'jsonwebtoken'
 
 const emailRegexPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+interface ICourseProgress {
+    courseId: string;
+    completedVideos: string[];
+}
+
 export interface IUser extends Document {
     name: string;
     email: string;
-    password: string;
-    avatar:{
+    password?: string;
+    avatar: {
         public_id: string;
         url: string;
-    },
+    };
     role: string;
     isVerified: boolean;
+    isLocked: boolean;
     courses: Array<{courseId: string}>;
+    courseProgress: ICourseProgress[];
     comparePassword: (password: string) => Promise<boolean>;
     SignAccessToken: () => string;
     SignRefreshToken: () => string;
-};
+}
 
 const userSchema: Schema<IUser> = new mongoose.Schema({
-    name:{
+    name: {
         type: String,
         required: [true, "Vui lòng nhập tên của bạn"],
     },
-    email:{
+    email: {
         type: String,
         required: [true, "Vui lòng nhập email của bạn"],
         validate: {
-            validator: function (value: string){
+            validator: function (value: string) {
                 return emailRegexPattern.test(value);
             },
             message: "Vui lòng nhập email hợp lệ",
         },
         unique: true,
     },
-    password:{
+    password: {
         type: String,
         minlength: [6, "Mật khẩu phải có ít nhất 6 ký tự"],
         select: false,
     },
-    avatar:{
+    avatar: {
         public_id: String,
         url: String,
     },
-    role:{
+    role: {
         type: String,
         default: "user",
     },
-    isVerified:{
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    isLocked: {
         type: Boolean,
         default: false,
     },
@@ -59,35 +70,40 @@ const userSchema: Schema<IUser> = new mongoose.Schema({
             courseId: String,
         }
     ],
+    courseProgress: [
+        {
+            courseId: String,
+            completedVideos: [String],
+        }
+    ],
 }, { timestamps: true });
 
-// hash password before saving user
+// FIX LỖI "next is not a function": 
+// Loại bỏ 'next', sử dụng nguyên bản tính năng Promise của async function trong Mongoose
 userSchema.pre<IUser>('save', async function () {
     if (!this.isModified('password')) {
-        return; 
+        return;
     }
-    this.password = await bcrypt.hash(this.password, 10);
+    if (this.password) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
 });
 
-// sign access token
 userSchema.methods.SignAccessToken = function () {
-    return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN || '',{
+    return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN || '', {
         expiresIn: '5m',
-    })
-}
+    });
+};
 
-//sign refresh token
 userSchema.methods.SignRefreshToken = function () {
-    return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN || '',{
+    return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN || '', {
         expiresIn: '3d',
-    })
-}
+    });
+};
 
-//compare password method
 userSchema.methods.comparePassword = async function (enteredPassword: string): Promise<boolean> {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 
 const userModel: Model<IUser> = mongoose.model("User", userSchema);
-
 export default userModel;

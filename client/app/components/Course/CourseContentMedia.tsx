@@ -1,6 +1,15 @@
 import { styles } from "@/app/styles/style";
 import CoursePlayer from "@/app/utils/CoursePlayer";
-import { useAddAnswerInQuestionMutation, useAddQuestionMutation, useAddReplyInReviewMutation, useAddReviewInCourseMutation, useGetCourseDetailsQuery } from "@/redux/features/courses/coursesApi";
+import { 
+  useAddAnswerInQuestionMutation, 
+  useAddQuestionMutation, 
+  useAddReplyInReviewMutation, 
+  useAddReviewInCourseMutation, 
+  useGetCourseDetailsQuery, 
+  useUpdateCourseProgressMutation, 
+  useGenerateQuizMutation 
+} from "@/redux/features/courses/coursesApi";
+import { useLoadUserQuery } from "@/redux/features/api/apiSlice"; // BỔ SUNG: Import hook load user
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AiFillStar, AiOutlineArrowLeft, AiOutlineArrowRight, AiOutlineStar } from "react-icons/ai";
@@ -22,15 +31,21 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
 
   const [userAnswers, setUserAnswers] = useState<{ [key: number]: string }>({});
   const [isQuizSubmitted, setIsQuizSubmitted] = useState(false);
+  const [studentQuizzes, setStudentQuizzes] = useState<any[]>([]);
 
   const { data: courseData, refetch: courseRefetch } = useGetCourseDetailsQuery(id, { refetchOnMountOrArgChange: true });
   const course = courseData?.course;
   const isReviewExists = course?.reviews?.find((item: any) => item.user._id === user._id);
 
+  // FIX UI KHÔNG UPDATE: Lấy hàm refetch từ useLoadUserQuery để đồng bộ trạng thái User
+  const { refetch: refetchUser } = useLoadUserQuery(undefined, {});
+
   const [addNewQuestion, { isSuccess: qSuccess }] = useAddQuestionMutation();
   const [addAnswerInQuestion, { isSuccess: aSuccess }] = useAddAnswerInQuestionMutation();
   const [addReviewInCourse, { isSuccess: rSuccess }] = useAddReviewInCourseMutation();
   const [addReplyInReview, { isSuccess: rrSuccess }] = useAddReplyInReviewMutation();
+  const [updateCourseProgress] = useUpdateCourseProgressMutation();
+  const [generateQuiz, { isLoading: isGeneratingStudentQuiz }] = useGenerateQuizMutation();
 
   useEffect(() => {
     if (qSuccess) { setQuestion(""); refetch(); toast.success("Gửi câu hỏi thành công"); }
@@ -42,10 +57,11 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
   useEffect(() => {
     setUserAnswers({});
     setIsQuizSubmitted(false);
+    setStudentQuizzes([]);
   }, [activeVideo]);
 
   const tabs = ["Tổng quan", "Tài nguyên", "Hỏi đáp", "Đánh giá", "Luyện Viết AI", "Bài tập (Quiz)"];
-  const quizzes = data[activeVideo]?.quizzes || [];
+  const quizzes = data[activeVideo]?.quizzes?.length > 0 ? data[activeVideo]?.quizzes : studentQuizzes;
 
   const handleSelectAnswer = (qIndex: number, option: string) => {
     if (isQuizSubmitted) return;
@@ -69,6 +85,31 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
     return score;
   };
 
+  const handleStudentGenerateQuiz = async () => {
+      try {
+          const contextData = `${data[activeVideo].title} - ${data[activeVideo].description}`;
+          const res = await generateQuiz({ contextData, questionCount: 5, level: "Intermediate" }).unwrap();
+          setStudentQuizzes(res.questions);
+          toast.success("AI đã tạo xong bài tập cho bạn!");
+      } catch (error: any) {
+          toast.error(error?.data?.message || "Lỗi tạo bài tập AI");
+      }
+  };
+
+  const handleMarkComplete = async () => {
+      try {
+          const res = await updateCourseProgress({ courseId: id, contentId: data[activeVideo]._id }).unwrap();
+          toast.success(res.message || "Đã lưu tiến độ học tập");
+          // ĐIỂM QUYẾT ĐỊNH: Gọi refetchUser để Redux tải lại mảng courseProgress
+          // UI sẽ lập tức render lại cái nút bấm và thanh Progress Bar bên cột phải
+          refetchUser(); 
+      } catch (error: any) {
+          toast.error("Lỗi cập nhật tiến độ");
+      }
+  };
+
+  const isCompleted = user?.courseProgress?.find((p: any) => p.courseId === id)?.completedVideos.includes(data[activeVideo]._id);
+
   return (
     <div className="w-full relative">
       <div className="w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-white/10 mb-6">
@@ -77,6 +118,22 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
         <button className={`${styles.button} !w-full sm:!w-auto !py-2 !px-4 text-xs flex items-center gap-2 justify-center ${activeVideo === 0 ? "opacity-50 cursor-not-allowed" : ""}`} onClick={() => activeVideo > 0 && setActiveVideo(activeVideo - 1)}><AiOutlineArrowLeft/> Bài trước</button>
+        
+        {/* NÚT TOGGLE TIẾN ĐỘ: Đã update logic group-hover */}
+        <button 
+            onClick={handleMarkComplete} 
+            className={`${styles.button} !w-full sm:!w-auto !py-2 !px-4 text-xs flex items-center gap-2 justify-center group transition-all ${isCompleted ? "!bg-emerald-500 !text-white hover:!bg-red-500" : "!bg-transparent !text-blue-500 border border-blue-500 hover:!bg-blue-500 hover:!text-white"}`}
+        >
+            {isCompleted ? (
+                <>
+                    <span className="block group-hover:hidden">Đã hoàn thành ✓</span>
+                    <span className="hidden group-hover:block">Hủy đánh dấu ✕</span>
+                </>
+            ) : (
+                "Đánh dấu hoàn thành"
+            )}
+        </button>
+
         <button className={`${styles.button} !w-full sm:!w-auto !py-2 !px-4 text-xs flex items-center gap-2 justify-center ${activeVideo === data.length - 1 ? "opacity-50 cursor-not-allowed" : ""}`} onClick={() => activeVideo < data.length - 1 && setActiveVideo(activeVideo + 1)}>Tiếp theo <AiOutlineArrowRight/></button>
       </div>
 
@@ -234,7 +291,10 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
           <div className="w-full">
             {quizzes.length === 0 ? (
                 <div className="py-10 text-center border border-dashed border-black/10 dark:border-white/10 rounded-xl mx-2 sm:mx-0">
-                  <p className="text-neutral-500 italic text-sm sm:text-base">Bài học này chưa có bài tập trắc nghiệm.</p>
+                  <p className="text-neutral-500 italic text-sm sm:text-base mb-4">Bài học này chưa có sẵn bài tập trắc nghiệm.</p>
+                  <button onClick={handleStudentGenerateQuiz} disabled={isGeneratingStudentQuiz} className={`${styles.button} !w-auto !inline-flex !bg-emerald-500`}>
+                      {isGeneratingStudentQuiz ? "Đang nhờ AI sinh bài tập..." : "Trợ lý AI: Sinh bài tập tự động"}
+                  </button>
                 </div>
             ) : (
                 <div className="space-y-8 px-2 sm:px-0">
@@ -271,11 +331,7 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
                                           }
 
                                           return (
-                                              <div 
-                                                  key={oIndex} 
-                                                  onClick={() => handleSelectAnswer(qIndex, option)}
-                                                  className={`p-3 rounded-lg border cursor-pointer transition-all text-sm sm:text-base ${optionStyle}`}
-                                              >
+                                              <div key={oIndex} onClick={() => handleSelectAnswer(qIndex, option)} className={`p-3 rounded-lg border cursor-pointer transition-all text-sm sm:text-base ${optionStyle}`}>
                                                   {option}
                                               </div>
                                           );
@@ -294,10 +350,7 @@ const CourseContentMedia = ({ data, id, activeVideo, setActiveVideo, user, refet
                   </div>
 
                   {!isQuizSubmitted && (
-                      <button 
-                          onClick={handleSubmitQuiz}
-                          className={`${styles.button} !w-full !py-4 text-sm sm:text-base tracking-widest`}
-                      >
+                      <button onClick={handleSubmitQuiz} className={`${styles.button} !w-full !py-4 text-sm sm:text-base tracking-widest`}>
                           Nộp bài kiểm tra
                       </button>
                   )}

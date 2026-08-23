@@ -32,12 +32,8 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
         setOpen(false); 
     }
     if (error) {
-        console.log("🔥 LỖI TẠI LOGIN:", error);
-        if ("data" in error) {
-            toast.error((error as any).data.message);
-        } else {
-            toast.error(`Lỗi hệ thống: ${(error as any).error || "Không thể kết nối Server"}`);
-        }
+        if ("data" in error) toast.error((error as any).data.message);
+        else toast.error(`Lỗi hệ thống: ${(error as any).error || "Không thể kết nối Server"}`);
     }
   }, [isSuccess, error, setOpen]);
 
@@ -56,7 +52,10 @@ const Login: FC<Props> = ({ setRoute, setOpen }) => {
           {errors.email && touched.email && <span className="text-red-500 text-xs mt-1 block">{errors.email}</span>}
         </div>
         <div className="relative">
-          <label className={styles.label}>Mật khẩu</label>
+          <div className="flex justify-between items-center">
+            <label className={styles.label}>Mật khẩu</label>
+            <span className="text-xs text-blue-500 hover:underline cursor-pointer mb-2 font-medium" onClick={() => setRoute("Forgot-Password")}>Quên mật khẩu?</span>
+          </div>
           <input type={show ? "text" : "password"} name="password" value={values.password} onChange={handleChange} className={styles.input} placeholder="••••••••" />
           <div className="absolute right-3 top-10 cursor-pointer text-neutral-500 hover:text-black dark:hover:text-white" onClick={() => setShow(!show)}>
             {show ? <AiOutlineEye size={20} /> : <AiOutlineEyeInvisible size={20} />}

@@ -14,7 +14,7 @@ export const ordersApi = apiSlice.injectEndpoints({
       query: () => ({
         url: "get-orders",
         method: "GET",
-        credentials: "include", // <--- Thêm dòng này để Admin lấy được bảng Invoices
+        credentials: "include", 
       }),
     }),
     createMoMoPayment: builder.mutation({
@@ -25,11 +25,20 @@ export const ordersApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+    refundOrder: builder.mutation({
+      query: ({ orderId }) => ({
+        url: "refund-order",
+        method: "POST",
+        body: { orderId },
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
 export const { 
     useCreateOrderMutation, 
     useGetAllOrdersQuery, 
-    useCreateMoMoPaymentMutation 
+    useCreateMoMoPaymentMutation,
+    useRefundOrderMutation
 } = ordersApi;

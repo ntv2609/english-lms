@@ -2,11 +2,11 @@
 import React, { FC, useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Box, Modal } from "@mui/material";
-import { AiOutlineDelete, AiOutlineMail } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineMail, AiOutlineLock, AiOutlineUnlock } from "react-icons/ai";
 import { useTheme } from "next-themes";
 import Loader from "../../Loader/Loader";
 import { format } from "timeago.js";
-import { useDeleteUserMutation, useGetAllUsersQuery, useUpdateUserRoleMutation } from "@/redux/features/user/userApi";
+import { useDeleteUserMutation, useGetAllUsersQuery, useUpdateUserRoleMutation, useLockUnlockUserMutation } from "@/redux/features/user/userApi";
 import { styles } from "@/app/styles/style";
 import toast from "react-hot-toast";
 
@@ -18,34 +18,41 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("admin");
   const [open, setOpen] = useState(false);
+  const [lockOpen, setLockOpen] = useState(false);
   const [userId, setUserId] = useState("");
+  const [lockReason, setLockReason] = useState("");
 
   const { isLoading, data, refetch } = useGetAllUsersQuery({}, { refetchOnMountOrArgChange: true });
   const [updateUserRole, { error: updateError, isSuccess: updateSuccess }] = useUpdateUserRoleMutation();
   const [deleteUser, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteUserMutation();
+  const [lockUnlockUser, { isSuccess: lockSuccess, error: lockError }] = useLockUnlockUserMutation();
 
   useEffect(() => {
     if (updateSuccess) { refetch(); toast.success("Role updated"); setActive(false); }
     if (updateError && "data" in updateError) toast.error((updateError as any).data.message);
     if (deleteSuccess) { refetch(); toast.success("User deleted"); setOpen(false); }
     if (deleteError && "data" in deleteError) toast.error((deleteError as any).data.message);
-  }, [updateError, updateSuccess, deleteSuccess, deleteError, refetch]);
+    if (lockSuccess) { refetch(); toast.success("Đã cập nhật trạng thái khóa"); setLockOpen(false); setLockReason(""); }
+    if (lockError && "data" in lockError) toast.error((lockError as any).data.message);
+  }, [updateError, updateSuccess, deleteSuccess, deleteError, lockSuccess, lockError, refetch]);
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.3 },
     { field: "name", headerName: "Name", flex: 0.5 },
     { field: "email", headerName: "Email", flex: 0.5 },
     { field: "role", headerName: "Role", flex: 0.3, renderCell: (p:any) => <span className={`px-2 py-1 text-xs font-bold rounded ${p.value === 'admin' ? 'bg-purple-500/10 text-purple-500' : 'bg-neutral-500/10 text-neutral-500'}`}>{p.value}</span> },
+    { field: "status", headerName: "Trạng thái", flex: 0.3, renderCell: (p:any) => <span className={`px-2 py-1 text-xs font-bold rounded ${p.row.isLocked ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500'}`}>{p.row.isLocked ? 'Locked' : 'Active'}</span> },
     { field: "courses", headerName: "Courses", flex: 0.3 },
     { field: "created_at", headerName: "Joined", flex: 0.4 },
     { field: "email_user", headerName: "Mail", flex: 0.2, renderCell: (params: any) => <a href={`mailto:${params.row.email}`} className="flex h-full items-center"><AiOutlineMail className="text-blue-500 hover:text-blue-400 transition-colors" size={20} /></a> },
+    { field: "lock", headerName: "Khóa", flex: 0.2, renderCell: (params: any) => <button className="flex h-full items-center" onClick={() => { setLockOpen(true); setUserId(params.row.id); }}>{params.row.isLocked ? <AiOutlineUnlock className="text-emerald-500 hover:text-emerald-400 transition-colors" size={20} /> : <AiOutlineLock className="text-yellow-500 hover:text-yellow-400 transition-colors" size={20} />}</button> },
     { field: "delete", headerName: "Delete", flex: 0.2, renderCell: (params: any) => <button className="flex h-full items-center" onClick={() => { setOpen(true); setUserId(params.row.id); }}><AiOutlineDelete className="text-red-500 hover:text-red-400 transition-colors" size={20} /></button> },
   ];
 
   const rows: any = [];
   const sourceData = isTeam ? data?.users?.filter((i:any) => i.role === "admin") : data?.users;
   sourceData?.forEach((item: any) => {
-    rows.push({ id: item._id, name: item.name, email: item.email, role: item.role, courses: item.courses.length, created_at: format(item.createdAt) });
+    rows.push({ id: item._id, name: item.name, email: item.email, role: item.role, isLocked: item.isLocked, courses: item.courses.length, created_at: format(item.createdAt) });
   });
 
   return (
@@ -70,7 +77,17 @@ const AllUsers: FC<Props> = ({ isTeam }) => {
         </Box>
       )}
 
-      {/* Modals for Add Admin and Delete */}
+      {/* Lock User Modal */}
+      <Modal open={lockOpen} onClose={() => setLockOpen(false)}>
+        <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-[400px] bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-xl shadow-2xl p-6 md:p-8 outline-none max-w-full">
+          <h2 className="text-xl font-Josefin font-bold text-black dark:text-white mb-6">Lý do thay đổi trạng thái?</h2>
+          <div className="space-y-4">
+            <textarea value={lockReason} onChange={(e) => setLockReason(e.target.value)} placeholder="Nhập lý do khóa / mở khóa (Sẽ gửi email cho người dùng)" className={`${styles.input} !h-24 py-3 resize-none`} />
+            <button className={`${styles.button} !mt-4`} onClick={() => lockUnlockUser({ id: userId, reason: lockReason })}>Xác nhận</button>
+          </div>
+        </Box>
+      </Modal>
+
       <Modal open={active} onClose={() => setActive(false)}>
         <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-[400px] bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-xl shadow-2xl p-6 md:p-8 outline-none max-w-full">
           <h2 className="text-xl font-Josefin font-bold text-black dark:text-white mb-6">Thêm Quản Trị Viên</h2>

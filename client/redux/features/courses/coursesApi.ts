@@ -36,6 +36,14 @@ export const coursesApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+    updateCourseProgress: builder.mutation({
+      query: (data) => ({
+        url: "update-course-progress",
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      }),
+    }),
     addQuestion: builder.mutation({
       query: (data) => ({
         url: "add-question",
@@ -83,9 +91,6 @@ export const coursesApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
-    // ==========================================
-    // CÁC ENDPOINT TÍCH HỢP AI MỚI
-    // ==========================================
     chatWithAI: builder.mutation({
       query: (data) => ({
         url: "ai/chat",
@@ -119,6 +124,7 @@ export const {
   useGetUsersAllCoursesQuery,
   useGetCourseDetailsQuery,
   useGetCourseContentQuery,
+  useUpdateCourseProgressMutation,
   useAddQuestionMutation,
   useAddAnswerInQuestionMutation,
   useAddReviewInCourseMutation,

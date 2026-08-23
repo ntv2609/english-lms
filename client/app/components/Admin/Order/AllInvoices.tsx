@@ -1,32 +1,39 @@
 "use client";
 import React, { FC, useEffect, useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { Box } from "@mui/material";
+import { Box, Modal } from "@mui/material";
 import { useTheme } from "next-themes";
 import Loader from "../../Loader/Loader";
-import { useGetAllOrdersQuery } from "@/redux/features/orders/ordersApi";
+import { useGetAllOrdersQuery, useRefundOrderMutation } from "@/redux/features/orders/ordersApi";
 import { useGetAllUsersQuery } from "@/redux/features/user/userApi";
 import { useGetAllCoursesQuery } from "@/redux/features/courses/coursesApi";
 import { format } from "timeago.js";
 import { styles } from "@/app/styles/style";
+import toast from "react-hot-toast";
 
 interface Props { isDashboard?: boolean; }
 
 const AllInvoices: FC<Props> = ({ isDashboard }) => {
   const { theme } = useTheme();
-  // FIX LỖI CACHE: Thêm refetchOnMountOrArgChange: true để ép RTK Query luôn lấy data mới nhất
-  const { isLoading, data } = useGetAllOrdersQuery({}, { refetchOnMountOrArgChange: true });
+  const { isLoading, data, refetch } = useGetAllOrdersQuery({}, { refetchOnMountOrArgChange: true });
   const { data: usersData } = useGetAllUsersQuery({}, { refetchOnMountOrArgChange: true });
   const { data: coursesData } = useGetAllCoursesQuery({}, { refetchOnMountOrArgChange: true });
+  const [refundOrderApi, { isSuccess, error }] = useRefundOrderMutation();
+  
   const [orderData, setOrderData] = useState<any>([]);
+  const [open, setOpen] = useState(false);
+  const [orderId, setOrderId] = useState("");
+
+  useEffect(() => {
+    if (isSuccess) { toast.success("Đã hoàn tiền đơn hàng"); setOpen(false); refetch(); }
+    if (error && "data" in error) toast.error((error as any).data.message);
+  }, [isSuccess, error, refetch]);
 
   useEffect(() => {
     if (data && usersData && coursesData) {
       const temp = data.orders.map((item: any) => {
         const user = usersData?.users?.find((u: any) => u._id === item.userId);
         const course = coursesData?.courses?.find((c: any) => c._id === item.courseId);
-        
-        // CƠ CHẾ FALLBACK: Tránh crash bảng khi khóa học hoặc user đã bị xóa
         return { 
             ...item, 
             userName: user?.name || "Người dùng đã xóa", 
@@ -44,7 +51,9 @@ const AllInvoices: FC<Props> = ({ isDashboard }) => {
     { field: "userName", headerName: "HỌ TÊN", flex: isDashboard ? 0.6 : 0.5 },
     ...(isDashboard ? [] : [{ field: "userEmail", headerName: "EMAIL", flex: 1 }, { field: "title", headerName: "TÊN KHÓA HỌC", flex: 1 }]),
     { field: "price", headerName: "SỐ TIỀN", flex: 0.3 },
+    { field: "status", headerName: "TRẠNG THÁI", flex: 0.3, renderCell: (p:any) => <span className={`px-2 py-1 text-xs font-bold rounded ${p.value === 'Success' ? 'bg-emerald-500/10 text-emerald-500' : p.value === 'Pending' ? 'bg-yellow-500/10 text-yellow-500' : 'bg-red-500/10 text-red-500'}`}>{p.value}</span> },
     { field: "created_at", headerName: "THỜI GIAN", flex: 0.5 },
+    ...(isDashboard ? [] : [{ field: "refund", headerName: "HOÀN TIỀN", flex: 0.3, renderCell: (p:any) => p.row.status === 'Success' ? <button onClick={() => { setOrderId(p.row.id); setOpen(true); }} className="text-xs font-bold text-red-500 hover:text-red-400 bg-red-500/10 px-2 py-1 rounded">Hoàn tiền</button> : null }]),
   ];
 
   const rows: any = [];
@@ -55,6 +64,7 @@ const AllInvoices: FC<Props> = ({ isDashboard }) => {
         userEmail: item.userEmail, 
         title: item.title, 
         price: item.price, 
+        status: item.status,
         created_at: format(item.createdAt) 
     });
   });
@@ -75,11 +85,23 @@ const AllInvoices: FC<Props> = ({ isDashboard }) => {
             "& .MuiDataGrid-cell": { borderBottom: "none", color: theme === "dark" ? "#e5e5e5" : "#171717", fontSize: "13px" },
             "& .MuiDataGrid-footerContainer": { borderTop: "1px solid rgba(255,255,255,0.05)" },
             "& .MuiCheckbox-root": { color: "#3b82f6 !important" },
+            "& .MuiDataGrid-toolbarContainer .MuiButton-text": { color: theme === "dark" ? "#fff" : "#000" },
           }}>
             <DataGrid checkboxSelection={!isDashboard} rows={rows} columns={columns} components={isDashboard ? {} : { Toolbar: GridToolbar }} />
           </Box>
         </Box>
       )}
+
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] sm:w-[400px] bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-xl shadow-2xl p-6 md:p-8 outline-none max-w-full">
+          <h2 className="text-xl font-Josefin font-bold text-black dark:text-white mb-2">Xác nhận hoàn tiền?</h2>
+          <p className="text-sm text-neutral-500 mb-8">Sau khi hoàn tiền, học viên sẽ bị tước quyền truy cập khóa học.</p>
+          <div className="flex justify-end gap-3">
+            <button className="px-4 py-2 text-sm font-medium text-black dark:text-white border border-black/10 dark:border-white/10 rounded-md" onClick={() => setOpen(false)}>Hủy</button>
+            <button className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md" onClick={() => refundOrderApi({ orderId })}>Hoàn tiền</button>
+          </div>
+        </Box>
+      </Modal>
     </div>
   );
 };

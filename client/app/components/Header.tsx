@@ -8,6 +8,8 @@ import CustomModal from "../utils/CustomModal";
 import Login from "./Auth/Login";
 import SignUp from "./Auth/SignUp";
 import Verification from "./Auth/Verification";
+import ForgotPassword from "./Auth/ForgotPassword";
+import ResetPassword from "./Auth/ResetPassword";
 import { useSelector } from "react-redux";
 import { useSession } from "next-auth/react";
 import { useSocialAuthMutation } from "@/redux/features/auth/authApi";
@@ -18,18 +20,18 @@ interface Props { open: boolean; setOpen: (open: boolean) => void; activeItem: n
 const Header: FC<Props> = ({ activeItem, setOpen, route, open, setRoute }) => {
   const [active, setActive] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
-  const [mounted, setMounted] = useState(false); // Cờ chống lỗi Hydration Mismatch
+  const [mounted, setMounted] = useState(false);
   const { user } = useSelector((state: any) => state.auth);
   const { data } = useSession();
-  const [socialAuth, { isSuccess }] = useSocialAuthMutation();
-useEffect(() => {
-    setMounted(true); // Chỉ bật sau khi Client đã mount xong
-  }, []);
+  const [socialAuth, { isSuccess, error }] = useSocialAuthMutation();
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (!user && data) socialAuth({ email: data?.user?.email, name: data?.user?.name, avatar: data?.user?.image });
     if (data !== null && isSuccess) { toast.success("Đăng nhập thành công"); setOpen(false); }
-  }, [data, user, isSuccess, socialAuth, setOpen]);
+    if (error && "data" in error) { toast.error((error as any).data.message); setOpen(false); }
+  }, [data, user, isSuccess, error, socialAuth, setOpen]);
 
   useEffect(() => {
     const handleScroll = () => setActive(window.scrollY > 50);
@@ -42,7 +44,6 @@ useEffect(() => {
       <div className={`w-full transition-all duration-300 ${active ? "bg-white/90 dark:bg-[#0A0A0A]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 py-3" : "bg-white dark:bg-[#050505] py-5 border-b border-transparent"}`}>
         <div className="max-w-[1400px] mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="text-2xl font-Josefin font-bold tracking-tighter text-black dark:text-white">EngGo<span className="text-blue-500">.</span></Link>
-
           <div className="hidden md:flex items-center gap-8">
             <NavItems activeItem={activeItem} isMobile={false} />
             <div className="w-[1px] h-4 bg-black/10 dark:bg-white/10" />
@@ -57,7 +58,6 @@ useEffect(() => {
               )}
             </div>
           </div>
-
           <div className="md:hidden flex items-center gap-4">
             <ThemeSwitcher />
             <HiOutlineMenuAlt3 size={24} className="text-black dark:text-white" onClick={() => setOpenSidebar(true)} />
@@ -89,6 +89,8 @@ useEffect(() => {
       {open && route === "Login" && <CustomModal open={open} setOpen={setOpen} setRoute={setRoute} activeItem={activeItem} component={Login} />}
       {open && route === "Sign-Up" && <CustomModal open={open} setOpen={setOpen} setRoute={setRoute} activeItem={activeItem} component={SignUp} />}
       {open && route === "Verification" && <CustomModal open={open} setOpen={setOpen} setRoute={setRoute} activeItem={activeItem} component={Verification} />}
+      {open && route === "Forgot-Password" && <CustomModal open={open} setOpen={setOpen} setRoute={setRoute} activeItem={activeItem} component={ForgotPassword} />}
+      {open && route === "Reset-Password" && <CustomModal open={open} setOpen={setOpen} setRoute={setRoute} activeItem={activeItem} component={ResetPassword} />}
     </div>
   );
 };

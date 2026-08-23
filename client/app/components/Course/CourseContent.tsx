@@ -29,7 +29,8 @@ const CourseContent = ({ id, user }: Props) => {
             </div>
             <div className="xl:col-span-1 hidden xl:block border-l border-black/5 dark:border-white/5 pl-8">
               <h3 className="font-Josefin font-bold text-lg text-black dark:text-white mb-6 uppercase tracking-wide">Nội dung khóa học</h3>
-              <CourseContentList setActiveVideo={setActiveVideo} data={data} activeVideo={activeVideo} />
+              {/* TRUYỀN THÊM user VÀ courseId XUỐNG LIST ĐỂ TÍNH TIẾN ĐỘ */}
+              <CourseContentList setActiveVideo={setActiveVideo} data={data} activeVideo={activeVideo} user={user} courseId={id} />
             </div>
           </div>
         </div>

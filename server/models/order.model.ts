@@ -4,6 +4,7 @@ export interface IOrder extends Document {
     courseId: string;
     userId: string;
     paymentInfo: object;
+    status: string;
 }
 
 const orderSchema = new Schema<IOrder>({
@@ -17,10 +18,13 @@ const orderSchema = new Schema<IOrder>({
     },
     paymentInfo: {
         type: Object,
-        // required: true, (Will enable this when integrating real payment gateway)
+    },
+    status: {
+        type: String,
+        default: "Pending",
+        enum: ["Pending", "Success", "Failed", "Expired", "Refunded"],
     }
 }, { timestamps: true });
 
 const OrderModel: Model<IOrder> = mongoose.model<IOrder>("Order", orderSchema);
-
 export default OrderModel;

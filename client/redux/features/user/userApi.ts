@@ -48,6 +48,28 @@ export const userApi = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+    lockUnlockUser: builder.mutation({
+      query: ({ id, reason }) => ({
+        url: "lock-user",
+        method: "PUT",
+        body: { id, reason },
+        credentials: "include",
+      }),
+    }),
+    forgotPassword: builder.mutation({
+      query: ({ email }) => ({
+        url: "forgot-password",
+        method: "POST",
+        body: { email },
+      }),
+    }),
+    resetPassword: builder.mutation({
+      query: ({ email, code, newPassword }) => ({
+        url: "reset-password",
+        method: "POST",
+        body: { email, code, newPassword },
+      }),
+    }),
   }),
 });
 
@@ -57,5 +79,8 @@ export const {
   useUpdatePasswordMutation, 
   useGetAllUsersQuery, 
   useUpdateUserRoleMutation, 
-  useDeleteUserMutation 
+  useDeleteUserMutation,
+  useLockUnlockUserMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation
 } = userApi;

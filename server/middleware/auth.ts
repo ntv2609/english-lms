@@ -4,39 +4,40 @@ import ErrorHandler from "../utils/ErrorHandler";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { redis } from "../utils/redis";
 
-// authenticated user
 export const isAuthenticated = CatchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
-  const access_token = req.cookies.access_token as string;
+    const access_token = req.cookies.access_token as string;
 
-  if (!access_token) {
-    return next(new ErrorHandler("Vui lòng đăng nhập để truy cập tính năng này", 400));
-  }
+    if (!access_token) {
+        return next(new ErrorHandler("Vui lòng đăng nhập để truy cập tính năng này", 400));
+    }
 
-  const decoded = jwt.verify(access_token, process.env.ACCESS_TOKEN as string) as JwtPayload;
+    const decoded = jwt.verify(access_token, process.env.ACCESS_TOKEN as string) as JwtPayload;
 
-  if (!decoded) {
-    return next(new ErrorHandler("access token is not valid", 400));
-  }
+    if (!decoded) {
+        return next(new ErrorHandler("Token truy cập không hợp lệ", 400));
+    }
 
-  // Tối ưu Redis Cache (Rolling Session)
-  // Nếu user truy cập trang, lấy session từ Redis
-  const user = await redis.get(decoded.id.toString());
+    const userStr = await redis.get(decoded.id.toString());
 
-  if (!user) {
-    return next(new ErrorHandler("Vui lòng đăng nhập để truy cập tài nguyên này", 400));
-  }
+    if (!userStr) {
+        return next(new ErrorHandler("Vui lòng đăng nhập để truy cập tài nguyên này", 400));
+    }
 
-  req.user = JSON.parse(user);
+    const user = JSON.parse(userStr);
 
-  next();
+    if (user.isLocked) {
+        return next(new ErrorHandler("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin.", 403));
+    }
+
+    req.user = user;
+    next();
 });
 
-// validate user role
 export const authorizeRoles = (...roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (!roles.includes(req.user?.role || '')) {
-      return next(new ErrorHandler(`Role: ${req.user?.role} không được phép truy cập tài nguyên này`, 403));
+    return (req: Request, res: Response, next: NextFunction) => {
+        if (!roles.includes(req.user?.role || '')) {
+            return next(new ErrorHandler(`Quyền ${req.user?.role} không được phép truy cập tài nguyên này`, 403));
+        }
+        next();
     }
-    next();
-  }
 }
